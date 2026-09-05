@@ -1,0 +1,829 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nykaa Fashion — Wishlist to Purchase</title>
+<style>
+  :root{
+    --ink:#211d1b; --muted:#6d625e; --line:#e9ded9; --paper:#fffaf7;
+    --rose:#d93567; --rose-dark:#a61f4b; --rose-pale:#fff0f4;
+    --plum:#352336; --cream:#fff7f2; --sage:#276b57; --amber:#9a5b16;
+    --shadow:0 18px 45px rgba(53,35,54,.10); --radius:18px;
+    font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(180deg,#fff8f5 0%,#fff 52%,#fdf4f1 100%);color:var(--ink);line-height:1.45}
+  button,select,input{font:inherit}
+  button{cursor:pointer;border:0;background:none}
+  button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #f3bdca;outline-offset:2px}
+  a{color:inherit}
+  .shell{max-width:1180px;margin:0 auto;padding:0 20px 56px}
+
+  /* ---------- App chrome / mode switch ---------- */
+  .modebar{max-width:1180px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:11px;font-weight:800;color:var(--rose-dark)}
+  .view-switch{display:flex;gap:5px;padding:4px;background:#f7efeb;border:1px solid var(--line);border-radius:999px}
+  .view-switch button{border:0;background:transparent;color:var(--muted);padding:8px 15px;border-radius:999px;font-size:12px;font-weight:900}
+  .view-switch button.active{background:var(--plum);color:#fff}
+  .view{display:block}.view.hidden{display:none}
+  .screen{display:none}.screen.active{display:block}
+
+  /* ---------- Ecommerce nav ---------- */
+  .ecom-nav{display:flex;align-items:center;gap:22px;padding:16px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .ecom-logo{font-weight:900;letter-spacing:-.04em;font-size:21px;color:var(--plum);white-space:nowrap;cursor:pointer;border:0;background:none;padding:0}
+  .ecom-logo span{color:var(--rose)}
+  .ecom-links{display:flex;gap:18px;font-size:12.5px;font-weight:800;color:#4d423e}
+  .ecom-links a{cursor:default;opacity:.85}
+  .ecom-search{flex:1;min-width:180px;max-width:440px;display:flex;align-items:center;gap:8px;background:#f7efeb;border:1px solid var(--line);border-radius:999px;padding:9px 15px;color:var(--muted);font-size:12.5px}
+  .ecom-icons{display:flex;align-items:center;gap:6px;margin-left:auto}
+  .icon-btn{position:relative;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:17px;color:var(--plum)}
+  .icon-btn:hover{background:#f7efeb}
+  .icon-badge{position:absolute;top:-2px;right:-2px;background:var(--rose);color:#fff;font-size:9px;font-weight:900;min-width:16px;height:16px;border-radius:999px;display:grid;place-items:center;padding:0 3px}
+
+  /* ---------- Home / catalogue ---------- */
+  .hero{padding:34px 0 26px;max-width:660px}
+  .hero h1{font-size:clamp(30px,4.6vw,48px);line-height:1.05;letter-spacing:-.055em;color:var(--plum);margin:9px 0 10px}
+  .hero p{font-size:15px;color:var(--muted);max-width:56ch;margin:0}
+  .catalog-head{display:flex;justify-content:space-between;align-items:end;gap:14px;margin-bottom:14px}
+  .catalog-head h2{font-size:20px;margin:0;color:var(--plum)}
+  .catalog-head span{font-size:12px;color:var(--muted)}
+  .catalog-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+  .product-card{border:1px solid var(--line);border-radius:16px;background:#fff;overflow:hidden;cursor:pointer;transition:transform .15s,box-shadow .15s}
+  .product-card:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(53,35,54,.12)}
+  .card-visual{height:190px;position:relative;display:grid;place-items:center;overflow:hidden}
+  .card-visual .monogram{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.72);font-weight:900;font-size:20px;color:var(--rose-dark)}
+  .card-heart{position:absolute;right:10px;top:10px;width:32px;height:32px;border-radius:50%;background:#fff;color:var(--rose-dark);font-size:17px;line-height:1;box-shadow:0 4px 10px rgba(0,0,0,.08)}
+  .card-heart.on{color:var(--rose)}
+  .card-copy{padding:13px}
+  .card-copy .brandline{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--rose-dark);font-weight:900}
+  .card-copy h3{font-size:13.5px;line-height:1.28;margin:5px 0 8px;color:var(--plum);min-height:34px}
+  .card-rating{font-size:11px;color:var(--amber);font-weight:800;margin-bottom:6px}
+  .card-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;color:var(--muted)}
+  .card-price{font-weight:900;color:var(--plum)}
+  .card-price s{font-size:10px;font-weight:600;color:#a89d99;margin-left:3px}
+  .card-off{font-size:10.5px;font-weight:900;color:var(--sage)}
+  .placeholder-note{margin-top:24px;font-size:11px;color:#a89d99;text-align:center}
+
+  /* ---------- Product detail ---------- */
+  .breadcrumb{font-size:12px;color:var(--muted);margin:20px 0 14px;font-weight:700}
+  .breadcrumb button{color:var(--rose-dark);font-weight:900}
+  .pdp{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(320px,.95fr);gap:28px;align-items:start}
+  .product-visual{min-height:400px;border-radius:18px;background:radial-gradient(circle at 20% 10%,#fff 0 12%,transparent 13%),linear-gradient(135deg,#f8d8df,#f9ede4 56%,#e8dbe7);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  .product-placeholder{text-align:center;color:#754c60;padding:40px}
+  .product-placeholder .monogram{width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.7);display:grid;place-items:center;font-size:29px;font-weight:900;margin:0 auto 14px;color:var(--rose-dark)}
+  .product-placeholder small{display:block;font-size:11px;max-width:220px;margin:0 auto}
+  .product-copy .brandline{font-size:12px;color:var(--rose-dark);font-weight:900;text-transform:uppercase;letter-spacing:.1em}
+  .product-copy h1{font-size:26px;line-height:1.16;letter-spacing:-.04em;margin:7px 0 8px;color:var(--plum)}
+  .rating-row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-bottom:4px}
+  .rating-pill{background:#eef9f4;color:var(--sage);border-radius:6px;padding:2px 7px;font-weight:900;font-size:12px}
+  .price-row{display:flex;align-items:baseline;gap:10px;margin:16px 0 15px;flex-wrap:wrap}
+  .price{font-size:26px;font-weight:900;color:var(--plum)}
+  .mrp{text-decoration:line-through;color:#a89d99;font-size:14px}
+  .tag{font-size:11px;font-weight:800;border-radius:30px;padding:5px 9px;background:#f4e8ee;color:var(--rose-dark)}
+  .size-row{margin:16px 0}
+  .size-row .label{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}
+  .size-chips{display:flex;flex-wrap:wrap;gap:8px}
+  .size-chip{border:1px solid var(--line);border-radius:9px;padding:8px 13px;font-size:12.5px;font-weight:800;color:var(--plum);background:#fff}
+  .size-chip.on{border-color:var(--plum);background:var(--plum);color:#fff}
+  .facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:18px 0}
+  .fact{border:1px solid var(--line);border-radius:12px;padding:10px 11px;background:#fff}
+  .fact dt{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:800}
+  .fact dd{margin:3px 0 0;font-size:12.5px;font-weight:700;word-break:break-word}
+  .desc{font-size:13px;color:var(--muted);margin:12px 0 18px}
+  .cta-row{display:flex;gap:10px;flex-wrap:wrap}
+  .btn{padding:13px 18px;border-radius:12px;background:var(--rose);color:#fff;font-weight:900;font-size:13.5px;transition:transform .15s,background .15s;white-space:nowrap}
+  .btn:hover:not(:disabled){background:var(--rose-dark);transform:translateY(-1px)}
+  .btn.secondary{background:#fff;color:var(--plum);border:1.5px solid var(--plum)}
+  .btn.secondary:hover:not(:disabled){background:#faf4f6}
+  .btn.ghost{background:transparent;color:var(--muted);padding:8px 8px;font-weight:800}
+  .btn.block{width:100%}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn.sm{padding:9px 13px;font-size:12px;border-radius:10px}
+
+  .wishlist-confirm{margin-top:14px;border-radius:14px;padding:14px 16px;background:var(--rose-pale);border:1px solid #f5c4d2;color:var(--rose-dark);font-size:13px}
+  .wishlist-confirm strong{display:block;font-size:14px;margin-bottom:3px;color:var(--plum)}
+
+  .checking-state{margin-top:14px;display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--muted);font-weight:700}
+  .checking-state .dot{width:8px;height:8px;border-radius:50%;background:var(--rose);display:inline-block;animation:pulse 1s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
+
+  /* prototype/demo control — deliberately understated */
+  .demo-control{margin-top:14px;border:1px dashed #d8c6be;border-radius:12px;padding:10px 13px;background:#fbf7f5;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .demo-control .lbl{font-size:10.5px;color:#96877f;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+  .demo-control .sub{font-size:11px;color:#a89a92;margin-top:2px}
+
+  .no-insight-card{margin-top:14px;border-radius:14px;padding:14px 16px;border:1px solid var(--line);background:#fff}
+  .no-insight-card strong{display:block;color:var(--plum);font-size:13.5px;margin-bottom:3px}
+  .no-insight-card p{font-size:12.5px;color:var(--muted);margin:0}
+
+  /* ---------- Toast notification (AI nudge) ---------- */
+  .toast-layer{position:fixed;top:18px;right:18px;z-index:60;display:flex;flex-direction:column;gap:10px;max-width:340px}
+  @media(max-width:640px){.toast-layer{left:12px;right:12px;top:12px;max-width:none}}
+  .toast{background:#fff;border:1px solid #f0c2ce;border-radius:16px;box-shadow:0 18px 40px rgba(53,35,54,.20);padding:15px 16px;animation:slidein .25s ease-out}
+  @keyframes slidein{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+  .toast .toast-title{font-weight:900;color:var(--plum);font-size:14px;display:flex;align-items:center;gap:6px}
+  .toast p{font-size:12.5px;color:#594d49;margin:7px 0 11px}
+  .toast .toast-actions{display:flex;gap:8px;align-items:center}
+  .toast .link-btn{color:var(--rose-dark);font-weight:900;font-size:12.5px}
+  .toast .dismiss-btn{color:var(--muted);font-size:12px;font-weight:700}
+  .demo-label{display:inline-block;border-radius:999px;padding:4px 9px;background:#fff0bf;color:#6f4b12;font-size:9.5px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;margin:6px 0 0}
+
+  /* ---------- Insights ---------- */
+  .insight-hero{border-radius:18px;background:linear-gradient(135deg,var(--plum),#65324e);color:#fff;padding:24px;margin:22px 0 18px}
+  .insight-hero .eyebrow{color:#f7bfd0}
+  .insight-hero h2{color:#fff;font-size:25px;margin:8px 0 6px}
+  .insight-hero p{color:#f5e3e8;font-size:13px;margin:0}
+  .insight-card{border:1px solid var(--line);border-radius:16px;padding:17px;margin:12px 0;background:#fff}
+  .insight-card .insight-head{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+  .insight-card h3{margin:0;color:var(--rose-dark);font-size:12px;letter-spacing:.1em;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+  .strength{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--sage);font-weight:900;white-space:nowrap}
+  .strength.mixed{color:var(--amber)}
+  .insight-card p{font-size:14.5px;margin:9px 0 12px;color:var(--plum);font-weight:700}
+  .review-evidence{border-top:1px solid #f1e8e4;padding-top:10px}
+  .review-evidence summary{cursor:pointer;color:var(--rose-dark);font-size:12px;font-weight:800}
+  .review{margin-top:10px;padding:10px 11px;background:#fffaf7;border-radius:10px;font-size:12.5px;color:#5c504c;border-left:3px solid #f3c4d0}
+  .review .review-meta{font-size:10px;color:#9a8d88;margin-top:6px}
+  .insights-cta{padding:10px 0 6px;margin-top:10px}
+
+  /* ---------- Cart / checkout / success ---------- */
+  .page-title{font-size:24px;color:var(--plum);letter-spacing:-.03em;margin:22px 0 18px}
+  .cart-layout{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(280px,.9fr);gap:22px;align-items:start}
+  .panel{background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}
+  .cart-row{display:flex;gap:14px}
+  .cart-row .thumb{width:88px;height:104px;border-radius:12px;background:linear-gradient(135deg,#f8d8df,#e8dbe7);display:grid;place-items:center;font-weight:900;color:var(--rose-dark);flex-shrink:0}
+  .cart-row .info h4{margin:0 0 4px;font-size:14.5px;color:var(--plum)}
+  .cart-row .info .meta{font-size:12px;color:var(--muted);margin-bottom:8px}
+  .qty-stepper{display:inline-flex;align-items:center;gap:0;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+  .qty-stepper button{width:28px;height:28px;font-weight:900;color:var(--plum)}
+  .qty-stepper span{width:28px;text-align:center;font-weight:800;font-size:13px}
+  .summary-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #f2e9e5;font-size:13px}
+  .summary-row:last-child{border-bottom:0}
+  .summary-row.total{font-weight:900;color:var(--plum);font-size:15px;padding-top:13px}
+  .summary-row .save{color:var(--sage);font-weight:800}
+  .form-block{margin-bottom:16px}
+  .form-block .label{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:6px}
+  .addr-card{border:1px solid var(--line);border-radius:12px;padding:13px 14px;font-size:13px;color:#4d423e}
+  .addr-card strong{display:block;color:var(--plum);margin-bottom:3px}
+  .pay-options{display:flex;flex-direction:column;gap:8px}
+  .pay-option{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:12px;padding:11px 13px;font-size:13px;font-weight:700;color:var(--plum)}
+  .pay-option input{accent-color:var(--rose)}
+  .demo-note{font-size:10.5px;color:#a89d99;margin-top:6px}
+  .success-wrap{max-width:480px;margin:60px auto;text-align:center}
+  .success-check{width:74px;height:74px;border-radius:50%;background:#eef9f4;color:var(--sage);display:grid;place-items:center;font-size:34px;margin:0 auto 18px}
+  .success-wrap h1{font-size:26px;color:var(--plum);margin:0 0 8px}
+  .success-wrap p{color:var(--muted);font-size:14px;margin:0 0 6px}
+  .success-flow{margin:22px 0 26px;font-size:12.5px;font-weight:900;color:var(--sage);background:#eef9f4;border-radius:999px;padding:10px 16px;display:inline-block}
+
+  /* ---------- How it works (system view) ---------- */
+  .system-header{padding:22px 0 22px;max-width:720px}
+  .system-header h1{font-size:32px;letter-spacing:-.05em;color:var(--plum);margin:8px 0}
+  .system-header p{color:var(--muted);font-size:14px;margin:0}
+  .system-flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:18px 0 4px}
+  .flow-step{border:1px solid var(--line);border-radius:13px;padding:13px 12px;background:#fff;position:relative}
+  .flow-step strong{display:block;color:var(--plum);font-size:12px;margin-bottom:4px}
+  .flow-step span{display:block;color:var(--muted);font-size:11px;line-height:1.35}
+  .flow-arrow{text-align:center;color:#c4b3ac;font-weight:900;font-size:13px;padding:4px 0}
+  .research-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr);gap:20px;align-items:start;margin-top:18px}
+  .system-note{background:#faf6f4;border-left:3px solid var(--rose);padding:12px 13px;color:#5e4d48;font-size:12px;margin:14px 0 0}
+  .notice{display:flex;gap:12px;align-items:flex-start;background:var(--cream);border:1px solid #f0d9cd;border-radius:14px;padding:13px 15px;color:#604941;font-size:13px;margin-bottom:20px}
+  .notice strong{color:var(--plum)}
+  .notice.warn{background:#fff8e9;border-color:#f0ddb6;color:#754a17}
+  .notice.good{background:#eef9f4;border-color:#cbe8da;color:#205945}
+  .panel.flat{box-shadow:none;background:#fff}
+  .panel h2{font-size:17px;letter-spacing:-.02em;margin:0 0 5px;color:var(--plum)}
+  .sub{font-size:12.5px;color:var(--muted);margin:0 0 15px}
+  .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:16px}
+  .toolbar label{font-size:12px;color:var(--muted);font-weight:700}
+  select,.file-input{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 11px;color:var(--ink);min-height:40px}
+  .file-input{font-size:12px;max-width:230px}
+  .demo-mode{border:1px solid #e8b7c6;border-radius:13px;background:#fff5f8;padding:13px;margin:14px 0 0}
+  .demo-mode label{display:flex;align-items:center;gap:9px;color:var(--plum);font-size:13px;font-weight:900;cursor:pointer}
+  .demo-mode input{width:17px;height:17px;accent-color:var(--rose)}
+  .demo-mode small{display:block;color:#7a5a65;font-size:11px;margin:6px 0 0 26px}
+  .data-panel{margin-top:20px}
+  .data-row{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #f2e9e5;padding:8px 0;font-size:12px}
+  .data-row:last-child{border-bottom:0}
+  .data-row span:first-child{color:var(--muted)}
+  .data-row span:last-child{text-align:right;font-weight:800;color:var(--plum)}
+  .funnel{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-top:14px}
+  .funnel-item{background:#fbf7f5;border:1px solid var(--line);border-radius:11px;padding:10px 6px;text-align:center;min-width:0}
+  .funnel-item strong{display:block;font-size:20px;color:var(--plum)}
+  .funnel-item span{display:block;font-size:8.5px;line-height:1.2;text-transform:uppercase;letter-spacing:.03em;color:var(--muted)}
+  .event-log{max-height:190px;overflow:auto;margin-top:12px;border-top:1px solid var(--line)}
+  .event{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #f4ece8;font-size:11px}
+  .event code{color:var(--rose-dark);font-weight:800}
+  .event time{color:var(--muted);white-space:nowrap}
+  .evidence-panels{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px}
+  .evidence-panels .box{border:1px solid var(--line);border-radius:14px;padding:14px 15px;background:#fff}
+  .evidence-panels .box h4{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--rose-dark)}
+  .evidence-panels .box ul{margin:0;padding-left:16px;font-size:12.5px;color:#4d423e;line-height:1.6}
+
+  .empty{padding:25px;text-align:center;border:1px dashed var(--line);border-radius:14px;color:var(--muted);font-size:13px}
+  .hidden{display:none!important}
+  footer{margin-top:24px;text-align:center;color:#958984;font-size:11px}
+
+  @media(max-width:980px){.catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.pdp{grid-template-columns:1fr}.system-flow{grid-template-columns:repeat(2,minmax(0,1fr))}.research-grid{grid-template-columns:1fr}.cart-layout{grid-template-columns:1fr}.evidence-panels{grid-template-columns:1fr}}
+  @media(max-width:640px){.shell{padding-inline:14px}.ecom-links{display:none}.panel{padding:16px}.facts{grid-template-columns:1fr}.funnel{grid-template-columns:repeat(2,minmax(0,1fr))}.catalog-grid{grid-template-columns:1fr}.hero h1{font-size:34px}}
+</style>
+</head>
+<body>
+
+<div class="modebar">
+  <div><div class="eyebrow">PM portfolio prototype</div></div>
+  <nav class="view-switch" aria-label="MVP views"><button id="customerViewButton" class="active" type="button">Customer Experience</button><button id="systemViewButton" type="button">How It Works</button></nav>
+</div>
+
+<!-- ============ CUSTOMER EXPERIENCE ============ -->
+<section class="view" id="customerView">
+  <main class="shell">
+    <nav class="ecom-nav">
+      <button class="ecom-logo" id="logoHome" type="button">nykaa <span>fashion</span></button>
+      <div class="ecom-links">
+        <a>Women</a><a>Men</a><a>Kids</a><a>Luxe</a><a>Brands</a><a>Sale</a>
+      </div>
+      <div class="ecom-search">🔍 Search for products, brands &amp; styles</div>
+      <div class="ecom-icons">
+        <button class="icon-btn" id="wishlistIconBtn" type="button" aria-label="Wishlist" title="Wishlist">♡<span class="icon-badge hidden" id="wishlistBadge">0</span></button>
+        <button class="icon-btn" id="bagIconBtn" type="button" aria-label="Bag" title="Bag">👜<span class="icon-badge hidden" id="bagBadge">0</span></button>
+        <button class="icon-btn" aria-label="Profile" title="Profile">👤</button>
+      </div>
+    </nav>
+
+    <!-- HOME -->
+    <section class="screen active" id="screenHome">
+      <div class="hero"><div class="eyebrow">Discover styles you'll love</div><h1>Save what you love.<br>Shop with confidence.</h1><p>When something you've saved has genuinely useful shopper feedback, we'll bring it back to you at the right moment — no discounts required.</p></div>
+      <div class="catalog-head"><h2>Trending Now</h2><span>Real product data from the Nykaa Fashion catalogue</span></div>
+      <div class="catalog-grid" id="catalogGrid"></div>
+      <p class="placeholder-note">Product visuals are elegant placeholders for this prototype — real photography isn't included in the catalogue export.</p>
+    </section>
+
+    <!-- PRODUCT DETAIL -->
+    <section class="screen" id="screenProduct">
+      <div class="breadcrumb"><button id="backToHomeFromProduct" type="button">← Back to catalogue</button></div>
+      <div class="pdp">
+        <div class="product-visual" id="productVisual"></div>
+        <div class="product-copy">
+          <div class="brandline" id="productBrand"></div>
+          <h1 id="productName"></h1>
+          <div class="rating-row hidden" id="ratingRow"><span class="rating-pill" id="ratingPill"></span><span id="ratingCountText"></span></div>
+          <div class="price-row"><span class="price" id="productPrice"></span><span class="mrp" id="productMrp"></span><span class="tag hidden" id="productDiscount"></span></div>
+          <div class="size-row hidden" id="sizeRow"><div class="label">Select size</div><div class="size-chips" id="sizeChips"></div></div>
+          <div class="facts" id="productFacts"></div>
+          <p class="desc" id="productDescription"></p>
+          <div class="cta-row">
+            <button class="btn" id="wishlistButton">♡ Add to Wishlist</button>
+            <button class="btn secondary" id="bagButton">Add to Bag</button>
+          </div>
+          <div class="wishlist-confirm hidden" id="wishlistConfirm"></div>
+          <div class="checking-state hidden" id="checkingState"><span class="dot"></span> Checking your saved item…</div>
+          <div class="demo-control hidden" id="demoControl">
+            <div><div class="lbl">Prototype demo control</div><div class="sub">This normally runs automatically a couple of seconds after wishlisting, representing a simulated 3-minute eligibility window.</div></div>
+            <button class="btn secondary sm" id="simulateButton">Check now</button>
+          </div>
+          <div id="noInsightSlot"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- AI REVIEW INSIGHTS -->
+    <section class="screen" id="screenInsights">
+      <div class="breadcrumb"><button id="backToProductFromInsights" type="button">← Back to product</button></div>
+      <div class="insight-hero"><div class="eyebrow">Your review companion</div><h2>✨ AI Review Insights</h2><p>What shoppers are saying — generated from recurring review evidence for this item. Supporting reviews stay visible so you can judge for yourself.</p></div>
+      <div id="insightCards"></div>
+      <div class="insights-cta"><button class="btn block" id="cartButtonFromInsights">Add to Cart</button><div class="wishlist-confirm hidden" id="cartConfirmInsights"></div></div>
+    </section>
+
+    <!-- CART -->
+    <section class="screen" id="screenCart">
+      <h2 class="page-title">Your Bag</h2>
+      <div class="cart-layout">
+        <div class="panel" id="cartItemsPanel"></div>
+        <div class="panel" id="cartSummaryPanel"></div>
+      </div>
+    </section>
+
+    <!-- CHECKOUT -->
+    <section class="screen" id="screenCheckout">
+      <h2 class="page-title">Checkout</h2>
+      <div class="cart-layout">
+        <div class="panel">
+          <div class="form-block"><div class="label">Delivery address</div><div class="addr-card"><strong>Demo Shopper</strong>221B Fashion Street, Bandra West<br>Mumbai, Maharashtra 400050<br>India · +91 98XXX XXXXX</div><div class="demo-note">Fictional demo address — no real delivery is scheduled.</div></div>
+          <div class="form-block"><div class="label">Payment method</div><div class="pay-options">
+            <label class="pay-option"><input type="radio" name="pay" checked> UPI — demo@upi</label>
+            <label class="pay-option"><input type="radio" name="pay"> Card ending 4242 (demo)</label>
+            <label class="pay-option"><input type="radio" name="pay"> Cash on Delivery</label>
+          </div><div class="demo-note">Simulated checkout only — no real payment is processed.</div></div>
+        </div>
+        <div class="panel" id="checkoutSummaryPanel"></div>
+      </div>
+    </section>
+
+    <!-- SUCCESS -->
+    <section class="screen" id="screenSuccess">
+      <div class="success-wrap">
+        <div class="success-check">✓</div>
+        <h1>Order placed</h1>
+        <p>Your order has been placed successfully.</p>
+        <p class="demo-note">Simulated demo purchase only — no real order was created.</p>
+        <div class="success-flow">Wishlist → Purchase journey completed</div>
+        <div><button class="btn secondary" id="startOverButton">Start over</button></div>
+      </div>
+    </section>
+  </main>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="view hidden" id="systemView">
+  <main class="shell">
+    <div class="system-header"><div class="eyebrow">System / research view</div><h1>How It Works</h1><p>From customer evidence to a timely purchase decision. This view explains the logic behind the customer experience — it is a prototype of the product logic, not a research dashboard.</p></div>
+
+    <section class="panel">
+      <div class="eyebrow">Evidence-to-insight pipeline</div>
+      <div class="system-flow">
+        <div class="flow-step"><strong>Customer reviews</strong><span>Product-linked review text is the only input considered.</span></div>
+        <div class="flow-step"><strong>AI review analysis</strong><span>Review text is checked for wording tied to known shopper concerns.</span></div>
+        <div class="flow-step"><strong>Theme extraction</strong><span>Recurring dimensions (material, fit, comfort, appearance, quality) are grouped.</span></div>
+        <div class="flow-step"><strong>Evidence &amp; sentiment</strong><span>Each theme is scored positive, negative, or mixed from the matched reviews.</span></div>
+        <div class="flow-step"><strong>Insight generation</strong><span>A theme needs 2+ supporting reviews before it becomes an insight.</span></div>
+        <div class="flow-step"><strong>Nudge eligibility</strong><span>At least one strong, evidence-backed theme must exist for this product.</span></div>
+        <div class="flow-step"><strong>Notification guardrails</strong><span>One nudge per product per 24h; the same insight is never repeated.</span></div>
+        <div class="flow-step"><strong>Customer insight</strong><span>A concise summary is shown with the source reviews underneath.</span></div>
+      </div>
+      <div class="system-note"><strong>Prototype implementation:</strong> deterministic theme matching over available review evidence (keyword/regex theme rules run in the browser) — not an external AI model or LLM call. No AI service is currently powering this prototype; "AI Review Insights" is the product-facing concept name for this mechanism.</div>
+      <div class="system-note"><strong>Guardrails:</strong> App-level complaints never become product claims. Mixed evidence stays visible. The Discovery Engine that surfaced the underlying barrier taxonomy is a separate, frozen research artifact — this MVP consumes its findings but does not modify it.</div>
+      <div class="evidence-panels">
+        <div class="box"><h4>Real evidence</h4><ul><li>Existing 20-product catalogue</li><li>Product-linked review export currently contains 0 records</li><li>App-store reviews are not treated as product-specific evidence</li></ul></div>
+        <div class="box"><h4>Demo evidence</h4><ul><li>Small synthetic review fixture, generated per selected product</li><li>Used only to demonstrate the intended UX</li><li>Not used in research findings — always clearly labelled</li></ul></div>
+      </div>
+    </section>
+
+    <div class="research-grid">
+      <div>
+        <section class="panel"><div class="eyebrow">Research &amp; prototype controls</div><h2>Evidence inputs</h2><p class="sub">These controls stay out of the customer journey. Existing research files are loaded locally and are never overwritten.</p>
+          <div class="toolbar"><label for="productSelect">Product</label><select id="productSelect" aria-label="Select product"></select><label class="file-input">Load catalog CSV <input id="catalogFile" type="file" accept=".csv,text/csv"></label><label class="file-input">Load product-review CSV <input id="reviewFile" type="file" accept=".csv,text/csv"></label></div>
+          <div class="demo-mode"><label><input id="demoMode" type="checkbox"> Demo Evidence Mode</label><small>OFF = real-data evidence-safe mode (no genuine product-specific nudges — 0 linked reviews exist). ON = synthetic fixture, generated for whichever product is selected, to demonstrate the intended UX only.</small></div>
+          <div class="notice" id="dataNotice"><span>●</span><div><strong>Evidence-first mode.</strong> Product insights require product-linked review text; app-level reviews are not presented as product evidence.</div></div>
+          <div class="data-panel" id="evidenceStatus"></div>
+        </section>
+      </div>
+      <div>
+        <section class="panel"><div class="eyebrow">Experiment-ready funnel</div><h2>Wishlist decision journey</h2><p class="sub">Session events only. Simulated actions are not experiment results.</p><div class="funnel" id="funnel"></div><div class="event-log" id="eventLog"></div><button class="btn ghost" id="resetButton">Reset local demo state</button></section>
+        <section class="panel"><div class="eyebrow">Real vs demo</div><h2>What the customer sees</h2><p class="sub"><strong>Real mode:</strong> the catalogue has 20 products and the product-linked review export has 0 records, so no genuine product-specific review nudge is generated.</p><p class="sub"><strong>Demo mode:</strong> a small in-memory synthetic fixture demonstrates the intended flow for the selected product. It is never written into research files or used for findings.</p></section>
+      </div>
+    </div>
+    <footer>Prototype only · customer experience and system explanation share the same local evidence rules. Discovery Engine, research datasets, survey data, and human adjudication are unchanged.</footer>
+  </main>
+</section>
+
+<div class="toast-layer" id="toastLayer"></div>
+
+<script>
+(function(){
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const state = {
+    products: [], reviews: [], selectedId: '', wished: new Set(), eligible: false,
+    analysis: null, nudgeDismissed: false,
+    cart: null, purchased: false,
+    selectedSize: '',
+    screen: 'home',
+    nudgeHistory: loadNudgeHistory(), demoMode: false,
+    events: []
+  };
+  const EVENT_KEY = 'nykaa-wishlist-decision-support-events-v1';
+  const NUDGE_KEY = 'nykaa-wishlist-decision-support-nudges-v1';
+  state.events = loadEvents();
+
+  /* ============ FROZEN-ADJACENT EVIDENCE ENGINE (preserved from prior MVP) ============ */
+  const themeRules = [
+    {key:'quality', label:'Quality', icon:'✓', positive:/\b(quality|well made|well-made|durable|sturdy|finish|strong)\b/i, negative:/\b(poor quality|cheap|damaged|defect|defective|broken)\b/i},
+    {key:'material', label:'Material', icon:'🧵', positive:/\b(material|fabric|cotton|soft|breathable|silk|leather|denim)\b/i, negative:/\b(thin|rough|itchy|synthetic|stiff)\b/i},
+    {key:'fit', label:'Fit', icon:'📐', positive:/\b(fit|fitting|true to size|size fits|comfortable size)\b/i, negative:/\b(small|large|loose|tight|snug|size issue|sizing|doesn't fit|doesnt fit)\b/i},
+    {key:'comfort', label:'Comfort', icon:'😊', positive:/\b(comfort|comfortable|all day|lightweight|easy to wear)\b/i, negative:/\b(uncomfortable|painful|heavy|hurts)\b/i},
+    {key:'appearance', label:'Appearance', icon:'👗', positive:/\b(look|looks|colour|color|beautiful|pretty|design|style|print)\b/i, negative:/\b(faded|different from|not as shown|ugly|misleading photo)\b/i}
+  ];
+
+  /* Real, verbatim catalogue rows (from nykaa_website_raw.csv) — 6 of the 20 products,
+     chosen for category/data diversity. No product facts are invented. */
+  const DEMO_PRODUCTS = [
+    {product_name:'Parx Medium Grey Shirt',brand:'Parx',price:'1100',mrp:'2199',discount_percent:'',rating:'',rating_count:'',category:'',color:'',material:'Cotton Pattern Printed Occasion Casual F',fit:'Slim Neckline Collar Neck Pocket Descrip',size_options:'',availability:'https://schema.org/InStock',description:'Buy Parx Medium Grey Shirt online at best prices on Nykaa Fashion. Uncover the perfect blend of style and savings & avail fast delivery with great offers.',source_url:'https://www.nykaafashion.com/parx-medium-grey-shirt/p/10011687'},
+    {product_name:'Folksong Yellow Floral Kurta',brand:'Folksong',price:'1260',mrp:'3599',discount_percent:'',rating:'',rating_count:'',category:'Kurtas Care instructions Hand Wash Pack',color:'s With Handblock Printed Florals',material:'Lyocell Pattern Floral Occasion Casual F',fit:'Regular Neckline Round Neck Closure Pull',size_options:'2XL, L, M, S, XL, XS',availability:'https://schema.org/InStock',description:'Buy Folksong Yellow Floral Kurta online at best prices on Nykaa Fashion. Uncover the perfect blend of style and savings & avail fast delivery with great offers.',source_url:'https://www.nykaafashion.com/w-yellow-floral-kurta/p/10110422'},
+    {product_name:'Marks & Spencer Flexifit Invisible Wired Full-cup Bra - Black',brand:'Marks & Spencer',price:'1950',mrp:'2999',discount_percent:'',rating:'4.4',rating_count:'1',category:'',color:'',material:'Nylon Pattern Solid',fit:'ness Kids Kids Indianwear Kids Westernwe',size_options:'',availability:'https://schema.org/InStock',description:'Buy Marks & Spencer Flexifit Invisible Wired Full-cup Bra - Black online at best prices on Nykaa Fashion. Uncover the perfect blend of style and savings & avail fast delivery with great offers.',source_url:'https://www.nykaafashion.com/marks-spencer-flexifit-invisible-wired-full-cup-bra-black/p/10169244'},
+    {product_name:'Spykar Women Black Lycra Skinny Fit Regular Length Jeans (adora)',brand:'Spykar',price:'2880',mrp:'3599',discount_percent:'',rating:'',rating_count:'',category:'',color:'Black',material:'Lycra Pattern Solid',fit:'Regular Length Jeans',size_options:'',availability:'https://schema.org/InStock',description:'Buy Spykar Women Black Lycra Skinny Fit Regular Length Jeans (adora) online at best prices on Nykaa Fashion. Uncover the perfect blend of style and savings & avail fast delivery with great offers.',source_url:'https://www.nykaafashion.com/spykar-women-black-lycra-skinny-fit-regular-length-jeans-adora/p/10018278'},
+    {product_name:'Marie Claire Women Casual Black Color Midi Solid Dress',brand:'Marie Claire',price:'1008',mrp:'2399',discount_percent:'',rating:'',rating_count:'',category:'Midi Sleeve Style Sleeveless Dress Shape',color:'',material:'Spandex Pattern Solid',fit:'A',size_options:'L, M, S, XL, XS',availability:'https://schema.org/InStock',description:'Buy Marie Claire Women Casual Black Color Midi Solid Dress online at best prices on Nykaa Fashion. Uncover the perfect blend of style and savings & avail fast delivery with great offers.',source_url:'https://www.nykaafashion.com/marie-claire-women-casual-black-color-midi-solid-dress/p/10095457'},
+    {product_name:'Puma Popcat 20 Backstrap Pre School Kids Blue Sandals',brand:'Puma',price:'750',mrp:'1499',discount_percent:'',rating:'3.7',rating_count:'1',category:'',color:'',material:'Synthetic Pattern Printed Occasion Casua',fit:'Kids Indianwear Kids Westernwear',size_options:'',availability:'https://schema.org/InStock',description:'Buy Puma Popcat 20 Backstrap Pre School Kids Blue Sandals online at best prices on Nykaa Fashion. Uncover the perfect blend of style and savings & avail fast delivery with great offers.',source_url:'https://www.nykaafashion.com/puma-popcat-20-backstrap-pre-school-kids-blue-sandals/p/10094454'}
+  ];
+
+  function loadEvents(){ try { const parsed = JSON.parse(localStorage.getItem(EVENT_KEY) || '[]'); return Array.isArray(parsed) ? parsed : []; } catch(e){ return []; } }
+  function saveEvents(){ try { localStorage.setItem(EVENT_KEY, JSON.stringify(state.events)); } catch(e){} }
+  function loadNudgeHistory(){ try { const parsed=JSON.parse(localStorage.getItem(NUDGE_KEY) || '[]'); return Array.isArray(parsed) ? parsed : []; } catch(e){ return []; } }
+  function saveNudgeHistory(){ try { localStorage.setItem(NUDGE_KEY, JSON.stringify(state.nudgeHistory)); } catch(e){} }
+  function track(name){
+    state.events.push({name, product_id:state.selectedId || '', timestamp:new Date().toISOString(), demo:true, evidence_mode:state.demoMode?'demo_evidence':'real_evidence_safe'});
+    saveEvents(); renderFunnel();
+  }
+  function escapeHtml(value){ return String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
+  function value(row, names){ for(const name of names){ if(row && row[name] != null && String(row[name]).trim() !== '') return String(row[name]).trim(); } return ''; }
+  function parseCSV(text){
+    const rows=[]; let row=[], cell='', quoted=false;
+    for(let i=0;i<text.length;i++){
+      const ch=text[i], next=text[i+1];
+      if(ch==='"'){ if(quoted && next==='"'){cell+='"';i++;} else quoted=!quoted; }
+      else if(ch===',' && !quoted){row.push(cell);cell='';}
+      else if((ch==='\n' || ch==='\r') && !quoted){ if(ch==='\r' && next==='\n') i++; row.push(cell); if(row.some(x=>x.trim()!=='')) rows.push(row); row=[];cell=''; }
+      else cell+=ch;
+    }
+    if(cell!=='' || row.length){row.push(cell);if(row.some(x=>x.trim()!==''))rows.push(row);}
+    if(!rows.length)return [];
+    const headers=rows.shift().map((h,i)=>i===0?h.replace(/^\uFEFF/,'').trim():h.trim());
+    return rows.map(values=>Object.fromEntries(headers.map((h,i)=>[h,values[i] == null ? '' : values[i].trim()])));
+  }
+  function normalizeProduct(row,index){
+    const name=value(row,['product_name','name','title']);
+    if(!name)return null;
+    const productId=value(row,['product_id','sku','id']) || 'product-'+(index+1)+'-'+name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,48);
+    return {id:productId,name,brand:value(row,['brand']),price:value(row,['price','current_price']),mrp:value(row,['mrp']),discount:value(row,['discount_percent','discount']),rating:value(row,['rating']),ratingCount:value(row,['rating_count','review_count']),category:value(row,['category']),color:value(row,['color']),material:value(row,['material']),fit:value(row,['fit']),sizes:value(row,['size_options','sizes']),availability:value(row,['availability']),description:value(row,['description']),image:value(row,['image_url','image']),sourceUrl:value(row,['source_url'])};
+  }
+  function normalizeReview(row,index){
+    const text=value(row,['review_text','text','review','content']);
+    const productId=value(row,['product_id','sku','product_sku']);
+    const productName=value(row,['product_name','product','title']);
+    return {id:value(row,['review_id','id']) || 'review-'+(index+1), productId, productName, text, source:value(row,['source','platform']) || 'unknown source', rating:value(row,['rating','stars']), date:value(row,['review_date','date','published_at']), sourceUrl:value(row,['source_url','url']), eligible:Boolean(text && (productId || productName))};
+  }
+  function currentProduct(){ return state.products.find(p=>p.id===state.selectedId) || state.products[0] || null; }
+
+  /* Synthetic demo fixture: generated per selected product so any of the 6 demo
+     products can demonstrate the flow. Clearly labelled everywhere it appears. */
+  function demoReviews(product){
+    if(!product)return [];
+    return [
+      {id:'demo-review-1',productId:product.id,productName:product.name,text:'The fabric feels soft and breathable, and it is comfortable for a full day. The fit is true to size.',source:'Demo evidence — synthetic fixture',rating:'',date:'Synthetic fixture',sourceUrl:'',eligible:true,synthetic:true},
+      {id:'demo-review-2',productId:product.id,productName:product.name,text:'I liked the soft material and comfortable feel. The fit is a little snug around the shoulders, so check the size details.',source:'Demo evidence — synthetic fixture',rating:'',date:'Synthetic fixture',sourceUrl:'',eligible:true,synthetic:true},
+      {id:'demo-review-3',productId:product.id,productName:product.name,text:'Soft fabric and comfortable to wear. The fit is true to size and the printed look is nice.',source:'Demo evidence — synthetic fixture',rating:'',date:'Synthetic fixture',sourceUrl:'',eligible:true,synthetic:true},
+      {id:'demo-review-4',productId:product.id,productName:product.name,text:'Really comfortable, wore it across a few different occasions and it held up well. Looks just as pictured.',source:'Demo evidence — synthetic fixture',rating:'',date:'Synthetic fixture',sourceUrl:'',eligible:true,synthetic:true}
+    ];
+  }
+  function evidenceRows(){ return state.demoMode ? demoReviews(currentProduct()) : state.reviews; }
+  function matchReview(product, review){
+    if(!review.eligible)return false;
+    const id=product.id && review.productId && product.id.toLowerCase()===review.productId.toLowerCase();
+    const name=product.name && review.productName && product.name.toLowerCase()===review.productName.toLowerCase();
+    return Boolean(id || name);
+  }
+  function analyze(product){
+    if(!product) return {linked:[],themes:[],strong:false};
+    const linked=evidenceRows().filter(r=>matchReview(product,r));
+    const themes=themeRules.map(rule=>{
+      const matched=linked.filter(r=>rule.positive.test(r.text)||rule.negative.test(r.text));
+      const positive=matched.filter(r=>rule.positive.test(r.text)&&!rule.negative.test(r.text));
+      const negative=matched.filter(r=>rule.negative.test(r.text));
+      if(matched.length<2)return null;
+      const mixed=positive.length>0 && negative.length>0;
+      let summary;
+      if(mixed) summary = rule.key==='fit' ? 'Most comments are positive, although some shoppers mention a slightly snug fit.' : rule.label+' feedback is mixed across the available reviews.';
+      else if(positive.length>=2) summary = 'Several shoppers mention '+(rule.key==='material'?'the material feels soft and comfortable':rule.label.toLowerCase())+'.';
+      else return null;
+      return {key:rule.key,label:rule.label,icon:rule.icon,summary,matched,positive,negative,mixed};
+    }).filter(Boolean);
+    return {linked,themes,strong:themes.length>0};
+  }
+  function nextNudgeTheme(){
+    const p=currentProduct();
+    if(!p || !state.analysis) return null;
+    const productNudges=state.nudgeHistory.filter(n=>n.product_id===p.id);
+    const recent=productNudges.some(n=>Date.now()-Date.parse(n.shown_at)<24*60*60*1000);
+    if(recent)return null;
+    return state.analysis.themes.find(theme=>!productNudges.some(n=>n.theme_key===theme.key)) || null;
+  }
+
+  /* ============ formatting helpers ============ */
+  function productInitials(product){ return (product.brand || product.name || 'NF').split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase(); }
+  function money(valueText){ const n=Number(String(valueText).replace(/[^0-9.]/g,'')); return Number.isFinite(n)&&n>0 ? '₹'+n.toLocaleString('en-IN') : ''; }
+  function discountPct(p){
+    if(p.discount) { const n=Number(String(p.discount).replace(/[^0-9.]/g,'')); if(Number.isFinite(n)&&n>0) return Math.round(n); }
+    const price=Number(String(p.price).replace(/[^0-9.]/g,'')), mrp=Number(String(p.mrp).replace(/[^0-9.]/g,''));
+    if(Number.isFinite(price)&&Number.isFinite(mrp)&&mrp>price) return Math.round((mrp-price)/mrp*100);
+    return 0;
+  }
+  function cardBackground(product){
+    const palettes={Parx:'linear-gradient(135deg,#cfd8de,#f6e7df)',Puma:'linear-gradient(135deg,#bfd8ed,#eaf0dc)',Folksong:'linear-gradient(135deg,#f3dd8f,#f8eee2)','Marks & Spencer':'linear-gradient(135deg,#d2d2da,#eee2e3)',Spykar:'linear-gradient(135deg,#c9d3e8,#f0e3e8)','Marie Claire':'linear-gradient(135deg,#e3c9d3,#f4ece4)'};
+    return palettes[product.brand] || 'linear-gradient(135deg,#ead5df,#f4ebe4)';
+  }
+  function sizeList(p){ return (p.sizes||'').split(',').map(s=>s.trim()).filter(Boolean); }
+
+  /* Display-only noise filter for the visible product-facts panel.
+     This NEVER touches p.material/p.fit/p.category (unchanged from
+     nykaa_website_raw.csv) -- it only decides what the facts UI shows.
+     Evidence: the Nykaa scraper's text-fallback layer captures attribute
+     values with a regex capped at 40 chars (`{2,40}`) run over flattened
+     page text with no word-boundary trimming. Checked directly: every
+     known-garbled value in this catalogue (e.g. "...Kids Westernwe",
+     "...Casual F") is exactly 39-40 characters; every genuine clean value
+     (e.g. "Nylon Pattern Solid", "Regular Length Jeans") is well under
+     that. A value at/near that cap is therefore a confirmed truncation
+     artifact, not inferred. No replacement value is ever invented --
+     unusable fields show "Not specified", never a guessed fit/material/
+     pattern/color. Genuinely empty fields are omitted, same as before.  */
+  const FACT_NOISE_PATTERNS=[/\bkids\b[\s\S]*\bkids\b/i,/\bindianwear\b|\bwesternwear\b/i,/select size|size guide/i,/skip to main|main content/i,/\bsold\b\s*$/i,/care instructions|hand wash/i];
+  function factDisplayValue(raw){
+    const v=(raw||'').trim();
+    if(!v) return null;                                  // genuinely empty -> omit row (unchanged)
+    if(v.length<=2) return 'Not specified';               // e.g. a bare "A" is not a real attribute
+    if(v.length>=38) return 'Not specified';              // confirmed 40-char regex-cap truncation
+    if(FACT_NOISE_PATTERNS.some(re=>re.test(v))) return 'Not specified'; // nav/category leakage
+    return v;                                             // clean -- shown exactly as scraped
+  }
+
+  /* ============ rendering: catalogue ============ */
+  function renderCatalog(){
+    const grid=$('catalogGrid'); if(!grid)return;
+    grid.innerHTML=state.products.slice(0,6).map(p=>{
+      const off=discountPct(p);
+      return '<article class="product-card" data-product-id="'+escapeHtml(p.id)+'">'
+        +'<div class="card-visual" style="background:'+cardBackground(p)+'"><div class="monogram">'+escapeHtml(productInitials(p))+'</div>'
+        +'<button class="card-heart'+(state.wished.has(p.id)?' on':'')+'" type="button" data-heart-id="'+escapeHtml(p.id)+'" aria-label="Wishlist '+escapeHtml(p.name)+'">'+(state.wished.has(p.id)?'♥':'♡')+'</button></div>'
+        +'<div class="card-copy"><div class="brandline">'+escapeHtml(p.brand || 'Nykaa Fashion')+'</div><h3>'+escapeHtml(p.name)+'</h3>'
+        +(p.rating?'<div class="card-rating">★ '+escapeHtml(p.rating)+(p.ratingCount?' ('+escapeHtml(p.ratingCount)+')':'')+'</div>':'')
+        +'<div class="card-meta"><span class="card-price">'+escapeHtml(money(p.price))+(p.mrp?' <s>'+escapeHtml(money(p.mrp))+'</s>':'')+'</span>'+(off>0?'<span class="card-off">'+off+'% off</span>':'')+'</div></div></article>';
+    }).join('');
+    grid.querySelectorAll('.product-card').forEach(card=>card.addEventListener('click',e=>{
+      if(e.target.closest('[data-heart-id]')) return;
+      openProduct(card.dataset.productId);
+    }));
+    grid.querySelectorAll('[data-heart-id]').forEach(btn=>btn.addEventListener('click',e=>{
+      e.stopPropagation(); toggleWishlistFromCard(btn.dataset.heartId);
+    }));
+  }
+  function toggleWishlistFromCard(id){
+    openProduct(id);
+    if(!state.wished.has(id)) addWishlist();
+  }
+
+  /* ============ rendering: product detail ============ */
+  function showProduct(){
+    const p=currentProduct(); if(!p)return;
+    $('productBrand').textContent=p.brand || 'Nykaa Fashion';
+    $('productName').textContent=p.name;
+    if(p.rating){ $('ratingRow').classList.remove('hidden'); $('ratingPill').textContent='★ '+p.rating; $('ratingCountText').textContent=p.ratingCount?p.ratingCount+' ratings':''; }
+    else $('ratingRow').classList.add('hidden');
+    $('productPrice').textContent=money(p.price)||'Price unavailable';
+    $('productMrp').textContent=p.mrp?money(p.mrp):'';
+    const off=discountPct(p);
+    $('productDiscount').textContent=off?off+'% off':'';
+    $('productDiscount').classList.toggle('hidden',!off);
+    const sizes=sizeList(p);
+    if(sizes.length){
+      $('sizeRow').classList.remove('hidden');
+      state.selectedSize = sizes.includes(state.selectedSize) ? state.selectedSize : sizes[0];
+      $('sizeChips').innerHTML=sizes.map(s=>'<button type="button" class="size-chip'+(s===state.selectedSize?' on':'')+'" data-size="'+escapeHtml(s)+'">'+escapeHtml(s)+'</button>').join('');
+      $('sizeChips').querySelectorAll('.size-chip').forEach(chip=>chip.addEventListener('click',()=>{ state.selectedSize=chip.dataset.size; showProduct(); }));
+    } else { $('sizeRow').classList.add('hidden'); state.selectedSize=''; }
+    const facts=[['Material',factDisplayValue(p.material)],['Fit',factDisplayValue(p.fit)],['Category',factDisplayValue(p.category)],['Availability',/InStock/i.test(p.availability||'')?'In stock':(p.availability||'')]].filter(([,v])=>v);
+    $('productFacts').innerHTML=facts.map(([k,v])=>'<div class="fact"><dt>'+escapeHtml(k)+'</dt><dd>'+escapeHtml(v)+'</dd></div>').join('');
+    $('productDescription').textContent=p.description || '';
+    if(p.image){$('productVisual').innerHTML='<img src="'+escapeHtml(p.image)+'" alt="'+escapeHtml(p.name)+'" style="width:100%;height:100%;object-fit:cover">';}
+    else $('productVisual').innerHTML='<div class="product-placeholder"><div class="monogram">'+escapeHtml(productInitials(p))+'</div><small>Product visual placeholder — photography not included in this catalogue export.</small></div>';
+    $('wishlistButton').textContent=state.wished.has(p.id)?'♥ Added to Wishlist':'♡ Add to Wishlist';
+    $('wishlistConfirm').classList.toggle('hidden', !state.wished.has(p.id));
+    if(state.wished.has(p.id)) $('wishlistConfirm').innerHTML='<strong>♥ Added to Wishlist</strong>Saved. We\u2019ll surface something useful if there\u2019s meaningful information about this item.';
+    $('demoControl').classList.toggle('hidden', !state.wished.has(p.id) || state.purchased);
+    if(state.analysis){ $('simulateButton').disabled=true; $('simulateButton').textContent='Checked ✓'; $('checkingState').classList.add('hidden'); }
+    else if(state._checkTimer){ $('simulateButton').disabled=true; $('simulateButton').textContent='Checking…'; $('checkingState').classList.remove('hidden'); }
+    else { $('simulateButton').disabled=false; $('simulateButton').textContent='Check now'; $('checkingState').classList.add('hidden'); }
+    renderNudgeSlot();
+    renderEvidenceStatus();
+  }
+  function openProduct(id){
+    if(!state.products.some(p=>p.id===id))return;
+    state.selectedId=id;
+    $('productSelect').value=id;
+    state.analysis=null; state.nudgeDismissed=false;
+    clearTimeout(state._checkTimer); state._checkTimer=null;
+    clearToasts();
+    showProduct();
+    goToScreen('product');
+  }
+
+  /* ============ wishlist / nudge / insights ============ */
+  function addWishlist(){
+    const p=currentProduct(); if(!p||state.wished.has(p.id))return;
+    state.wished.add(p.id); track('wishlist_added');
+    showProduct(); renderCatalog(); updateIconBadges();
+    scheduleEligibilityCheck();
+  }
+  /* Automatic journey: previously the customer had to click "Simulate 3
+     minutes" to proceed. Now a short ~2.4s delay runs automatically after
+     Add to Wishlist (communicated as "Checking your saved item…",
+     representing the simulated 3-minute eligibility window), then the
+     same eligibility/nudge logic that always existed fires on its own.
+     The button is kept only as an optional manual override -- e.g. to
+     skip the wait or re-run after toggling Demo Mode -- never required. */
+  function scheduleEligibilityCheck(){
+    const p=currentProduct(); if(!p||!state.wished.has(p.id)||state.analysis)return;
+    clearTimeout(state._checkTimer);
+    $('checkingState').classList.remove('hidden');
+    $('simulateButton').disabled=true; $('simulateButton').textContent='Checking…';
+    state._checkTimer=setTimeout(runEligibilityCheck,2400);
+  }
+  function runEligibilityCheck(){
+    clearTimeout(state._checkTimer); state._checkTimer=null;
+    const p=currentProduct(); if(!p||!state.wished.has(p.id))return;
+    state.analysis=analyze(p);
+    if(state.analysis.strong) track('nudge_eligible');
+    $('checkingState').classList.add('hidden');
+    $('simulateButton').disabled=true; $('simulateButton').textContent='Checked ✓';
+    showNudgeToast();
+    renderEvidenceStatus();
+  }
+  function showNudgeToast(){
+    const p=currentProduct();
+    $('noInsightSlot').innerHTML='';
+    if(!state.analysis || !state.analysis.strong){
+      $('noInsightSlot').innerHTML='<div class="no-insight-card"><strong>No new insight right now</strong><p>We\u2019ll keep this item saved for you — there isn\u2019t enough customer feedback yet to share something genuinely useful.</p></div>';
+      return;
+    }
+    const theme=nextNudgeTheme();
+    if(!theme){
+      $('noInsightSlot').innerHTML='<div class="no-insight-card"><strong>Nothing new to share right now</strong><p>We won\u2019t repeat the same insight for this item within 24 hours.</p></div>';
+      return;
+    }
+    state.nudgeHistory.push({product_id:p.id,theme_key:theme.key,shown_at:new Date().toISOString()}); saveNudgeHistory();
+    track('nudge_shown');
+    const toast=document.createElement('div');
+    toast.className='toast'; toast.id='nudgeToast';
+    toast.innerHTML='<div class="toast-title">✨ Something worth knowing</div><p>'+escapeHtml(theme.summary)+'</p>'
+      +(state.demoMode?'<div class="demo-label">Demo evidence — synthetic, not research data.</div>':'')
+      +'<div class="toast-actions" style="margin-top:10px"><button class="link-btn" id="nudgeGoto">See what shoppers are saying →</button><button class="dismiss-btn" id="nudgeDismiss">Dismiss</button></div>';
+    clearToasts(); $('toastLayer').appendChild(toast);
+    $('nudgeGoto').addEventListener('click',goToInsights);
+    $('nudgeDismiss').addEventListener('click',()=>{ state.nudgeDismissed=true; track('nudge_dismissed'); clearToasts(); });
+  }
+  function clearToasts(){ $('toastLayer').innerHTML=''; }
+  function renderNudgeSlot(){ /* toast is transient; nothing persistent to re-render here */ }
+  function goToInsights(){
+    const p=currentProduct(); if(!p||!state.analysis||!state.analysis.strong)return;
+    track('nudge_clicked'); track('review_insights_viewed');
+    clearToasts();
+    renderInsights();
+    goToScreen('insights');
+  }
+  function renderInsights(){
+    const a=state.analysis; if(!a)return;
+    const supportLabel=state.demoMode?'supporting synthetic review':'supporting original review';
+    $('insightCards').innerHTML=a.themes.map(theme=>'<article class="insight-card"><div class="insight-head"><h3><span>'+theme.icon+'</span> '+escapeHtml(theme.label.toUpperCase())+'</h3><span class="strength'+(theme.mixed?' mixed':'')+'">'+(theme.mixed?'mixed evidence':'recurring positive evidence')+'</span></div><p>'+escapeHtml(theme.summary)+'</p>'
+      +(state.demoMode?'<div class="demo-label">Demo evidence — synthetic, not research data.</div>':'')
+      +'<details class="review-evidence"><summary>View '+theme.matched.length+' '+supportLabel+(theme.matched.length===1?'':'s')+'</summary>'
+      +theme.matched.map(r=>'<div class="review">\u201c'+escapeHtml(r.text)+'\u201d<div class="review-meta">'+(r.synthetic?'Demo evidence — synthetic, not research data. · Synthetic fixture':'Original customer review · '+escapeHtml(r.source))+(r.rating?' · rating '+escapeHtml(r.rating):'')+(r.date?' · '+escapeHtml(r.date):'')+'</div></div>').join('')
+      +'</details></article>').join('');
+  }
+  function addCartFromInsights(){
+    addToCart();
+    $('cartConfirmInsights').classList.remove('hidden');
+    $('cartConfirmInsights').innerHTML='<strong>✓ Added to Bag</strong><button class="btn secondary sm" id="viewBagFromInsights" style="margin-top:8px">View Bag</button>';
+    $('viewBagFromInsights').addEventListener('click',()=>goToScreen('cart'));
+  }
+
+  /* ============ cart / checkout / purchase ============ */
+  function addToCart(){
+    const p=currentProduct(); if(!p)return;
+    state.cart={product:p, size:state.selectedSize||'', qty:1};
+    track('add_to_cart_clicked');
+    updateIconBadges();
+  }
+  function addToBagDirect(){
+    addToCart();
+    $('wishlistConfirm').classList.remove('hidden');
+    $('wishlistConfirm').innerHTML='<strong>✓ Added to Bag</strong><button class="btn secondary sm" id="viewBagFromProduct" style="margin-top:8px">View Bag</button>';
+    $('viewBagFromProduct').addEventListener('click',()=>goToScreen('cart'));
+  }
+  function renderCart(){
+    if(!state.cart){ $('cartItemsPanel').innerHTML='<div class="empty">Your bag is empty. Wishlist or add a product to get started.</div>'; $('cartSummaryPanel').innerHTML=''; return; }
+    const c=state.cart, p=c.product;
+    const price=Number(String(p.price).replace(/[^0-9.]/g,''))||0, mrp=Number(String(p.mrp).replace(/[^0-9.]/g,''))||price;
+    const subtotal=price*c.qty, mrpTotal=mrp*c.qty, savings=Math.max(0,mrpTotal-subtotal);
+    $('cartItemsPanel').innerHTML='<div class="cart-row"><div class="thumb">'+escapeHtml(productInitials(p))+'</div><div class="info"><h4>'+escapeHtml(p.name)+'</h4><div class="meta">'+(c.size?'Size: '+escapeHtml(c.size)+' · ':'')+escapeHtml(p.brand||'')+'</div>'
+      +'<div class="qty-stepper"><button type="button" id="qtyMinus">−</button><span>'+c.qty+'</span><button type="button" id="qtyPlus">+</button></div></div></div>';
+    $('cartSummaryPanel').innerHTML='<h2 style="font-size:16px;color:var(--plum);margin:0 0 12px">Price Details</h2>'
+      +'<div class="summary-row"><span>Total MRP</span><span>'+money(String(mrpTotal))+'</span></div>'
+      +(savings>0?'<div class="summary-row"><span>Discount on MRP</span><span class="save">− '+money(String(savings))+'</span></div>':'')
+      +'<div class="summary-row"><span>Delivery</span><span>Free</span></div>'
+      +'<div class="summary-row total"><span>Total Amount</span><span>'+money(String(subtotal))+'</span></div>'
+      +'<button class="btn block" id="checkoutButton" style="margin-top:14px">Proceed to Checkout</button>';
+    $('qtyMinus').addEventListener('click',()=>{ if(c.qty>1){c.qty--; renderCart(); updateIconBadges();} });
+    $('qtyPlus').addEventListener('click',()=>{ c.qty++; renderCart(); updateIconBadges(); });
+    $('checkoutButton').addEventListener('click',()=>goToScreen('checkout'));
+  }
+  function renderCheckout(){
+    if(!state.cart){ $('checkoutSummaryPanel').innerHTML='<div class="empty">Your bag is empty.</div>'; return; }
+    const c=state.cart, p=c.product;
+    const price=Number(String(p.price).replace(/[^0-9.]/g,''))||0;
+    const subtotal=price*c.qty;
+    $('checkoutSummaryPanel').innerHTML='<h2 style="font-size:16px;color:var(--plum);margin:0 0 12px">Order Summary</h2>'
+      +'<div class="summary-row"><span>'+escapeHtml(p.name)+(c.size?' · '+escapeHtml(c.size):'')+' × '+c.qty+'</span><span>'+money(String(subtotal))+'</span></div>'
+      +'<div class="summary-row"><span>Delivery</span><span>Free</span></div>'
+      +'<div class="summary-row total"><span>Total</span><span>'+money(String(subtotal))+'</span></div>'
+      +'<button class="btn block" id="placeOrderButton" style="margin-top:14px">Place Order</button>';
+    $('placeOrderButton').addEventListener('click',placeOrder);
+  }
+  function placeOrder(){
+    if(state.purchased)return; state.purchased=true; track('purchase_simulated');
+    state.cart=null; updateIconBadges();
+    goToScreen('success');
+  }
+
+  /* ============ funnel / evidence status (How It Works) ============ */
+  function renderFunnel(){
+    const names=['wishlist_added','nudge_shown','nudge_clicked','review_insights_viewed','add_to_cart_clicked','purchase_simulated','nudge_dismissed','nudge_eligible'];
+    const labels=['Wishlist added','Nudge shown','Nudge clicked','Insights viewed','Add to cart','Purchase','Nudge dismissed','Nudge eligible'];
+    $('funnel').innerHTML=names.map((n,i)=>'<div class="funnel-item"><strong>'+state.events.filter(e=>e.name===n).length+'</strong><span>'+labels[i]+'</span></div>').join('');
+    const recent=state.events.slice().reverse().slice(0,14);
+    $('eventLog').innerHTML=recent.length?recent.map(e=>'<div class="event"><code>'+escapeHtml(e.name)+'</code><time>'+new Date(e.timestamp).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})+'</time></div>').join(''):'<div class="empty">No session events yet.</div>';
+  }
+  function renderEvidenceStatus(){
+    const p=currentProduct(); if(!p){$('evidenceStatus').innerHTML='<div class="empty">Load a product catalog first.</div>';return;}
+    const a=analyze(p); const linked=a.linked.length, sourceRows=evidenceRows(), nonProduct=sourceRows.filter(r=>!r.eligible).length;
+    const modeLine=state.demoMode?'<div class="data-row"><span>Evidence mode</span><span>Demo fixture only</span></div><div class="demo-label">Demo evidence — synthetic, not research data.</div>':'<div class="data-row"><span>Evidence mode</span><span>Real / evidence-safe</span></div>';
+    const loadedLine=state.demoMode?'<div class="data-row"><span>Real review records loaded</span><span>'+state.reviews.length+' (not used)</span></div><div class="data-row"><span>Synthetic records used</span><span>'+sourceRows.length+'</span></div>':'<div class="data-row"><span>Review records loaded</span><span>'+state.reviews.length+'</span></div>';
+    $('evidenceStatus').innerHTML='<div class="data-row"><span>Selected product</span><span>'+escapeHtml(p.name)+'</span></div>'+modeLine+loadedLine+'<div class="data-row"><span>Product-linked records used</span><span>'+linked+'</span></div><div class="data-row"><span>Unlinked/general records excluded</span><span>'+nonProduct+'</span></div><div class="data-row"><span>Recurring themes (2+ records)</span><span>'+a.themes.length+'</span></div>'
+      +(a.strong?'<div class="notice good" style="margin:14px 0 0"><strong>'+(state.demoMode?'Demo nudge eligible.':'Nudge eligible.')+'</strong> At least one recurring theme is supported by product-linked reviews.</div>':'<div class="notice warn" style="margin:14px 0 0"><strong>No nudge sent.</strong> Not enough recurring product-linked review evidence for this product. No promotional claim is generated.</div>');
+  }
+
+  /* ============ navigation ============ */
+  function goToScreen(name){
+    state.screen=name;
+    ['Home','Product','Insights','Cart','Checkout','Success'].forEach(s=>{
+      $('screen'+s).classList.toggle('active', s.toLowerCase()===name);
+    });
+    if(name==='cart') renderCart();
+    if(name==='checkout') renderCheckout();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  function updateIconBadges(){
+    const wCount=state.wished.size, bCount=state.cart?state.cart.qty:0;
+    $('wishlistBadge').textContent=wCount; $('wishlistBadge').classList.toggle('hidden',wCount===0);
+    $('bagBadge').textContent=bCount; $('bagBadge').classList.toggle('hidden',bCount===0);
+  }
+  function startOver(){
+    state.wished=new Set(); state.cart=null; state.purchased=false; state.analysis=null; state.nudgeDismissed=false;
+    clearTimeout(state._checkTimer); state._checkTimer=null;
+    clearToasts(); updateIconBadges();
+    if(state.products.length){ state.selectedId=state.products[0].id; $('productSelect').value=state.selectedId; }
+    goToScreen('home'); renderCatalog();
+  }
+
+  /* ============ catalogue / CSV loading (research controls) ============ */
+  function setProducts(rows){
+    const products=rows.map(normalizeProduct).filter(Boolean);
+    if(!products.length)throw new Error('No product rows found. Expected a product_name or name column.');
+    state.products=products; state.selectedId=products[0].id; state.wished=new Set(); state.cart=null; state.purchased=false;
+    $('productSelect').innerHTML=products.map(p=>'<option value="'+escapeHtml(p.id)+'">'+escapeHtml(p.name)+'</option>').join('');
+    renderCatalog(); showProduct(); renderEvidenceStatus(); updateIconBadges();
+  }
+  function setReviews(rows){ state.reviews=rows.map(normalizeReview).filter(r=>r.text); renderEvidenceStatus(); }
+
+  /* ============ view switch (Customer Experience / How It Works) ============ */
+  function setView(view){
+    const customer=view==='customer';
+    $('customerView').classList.toggle('hidden',!customer); $('systemView').classList.toggle('hidden',customer);
+    $('customerViewButton').classList.toggle('active',customer); $('systemViewButton').classList.toggle('active',!customer);
+  }
+
+  function bind(){
+    $('customerViewButton').addEventListener('click',()=>setView('customer'));
+    $('systemViewButton').addEventListener('click',()=>setView('system'));
+    $('logoHome').addEventListener('click',()=>goToScreen('home'));
+    $('backToHomeFromProduct').addEventListener('click',()=>goToScreen('home'));
+    $('backToProductFromInsights').addEventListener('click',()=>goToScreen('product'));
+    $('wishlistIconBtn').addEventListener('click',()=>{ if(state.wished.size) goToScreen('home'); });
+    $('bagIconBtn').addEventListener('click',()=>{ if(state.cart) goToScreen('cart'); });
+    $('wishlistButton').addEventListener('click',addWishlist);
+    $('bagButton').addEventListener('click',addToBagDirect);
+    $('simulateButton').addEventListener('click',runEligibilityCheck);
+    $('cartButtonFromInsights').addEventListener('click',addCartFromInsights);
+    $('startOverButton').addEventListener('click',startOver);
+
+    $('productSelect').addEventListener('change',e=>{ state.selectedId=e.target.value; state.selectedSize=''; state.analysis=null; clearTimeout(state._checkTimer); state._checkTimer=null; clearToasts(); showProduct(); });
+    $('demoMode').addEventListener('change',e=>{
+      state.demoMode=e.target.checked; state.analysis=null; clearToasts();
+      clearTimeout(state._checkTimer); state._checkTimer=null;
+      $('simulateButton').disabled=false; $('simulateButton').textContent='Check now';
+      $('checkingState').classList.add('hidden');
+      $('noInsightSlot').innerHTML='';
+      $('dataNotice').className=state.demoMode?'notice warn':'notice';
+      $('dataNotice').innerHTML=state.demoMode?'<span>●</span><div><strong>Demo Evidence Mode is ON.</strong> The selected product is paired with a synthetic review fixture for UX demonstration only. These records are not research data.</div>':'<span>●</span><div><strong>Evidence-first mode.</strong> Product and review data are loaded from the existing project exports. Product insights require product-linked review text; app-level reviews are not presented as product evidence.</div>';
+      renderEvidenceStatus();
+    });
+    $('catalogFile').addEventListener('change',e=>{ const f=e.target.files[0]; if(!f)return; const reader=new FileReader(); reader.onerror=()=>alert('Could not read the catalog CSV.'); reader.onload=ev=>{ try{ setProducts(parseCSV(ev.target.result)); $('dataNotice').className='notice good'; $('dataNotice').innerHTML='<span>●</span><div><strong>Catalog loaded.</strong> Product data came from the selected existing CSV.</div>'; }catch(err){ alert('Catalog load failed: '+err.message); } }; reader.readAsText(f); });
+    $('reviewFile').addEventListener('change',e=>{ const f=e.target.files[0]; if(!f)return; const reader=new FileReader(); reader.onerror=()=>alert('Could not read the review CSV.'); reader.onload=ev=>{ try{ setReviews(parseCSV(ev.target.result)); }catch(err){ alert('Review load failed: '+err.message); } }; reader.readAsText(f); });
+    $('resetButton').addEventListener('click',()=>{ state.events=[]; state.nudgeHistory=[]; saveEvents(); saveNudgeHistory(); renderFunnel(); });
+  }
+
+  state.products=DEMO_PRODUCTS.map(normalizeProduct);
+  state.selectedId=state.products[0].id;
+  $('productSelect').innerHTML=state.products.map(p=>'<option value="'+escapeHtml(p.id)+'">'+escapeHtml(p.name)+'</option>').join('');
+  bind(); renderCatalog(); showProduct(); renderEvidenceStatus(); renderFunnel(); updateIconBadges();
+})();
+</script>
+</body>
+</html>
