@@ -1,0 +1,23 @@
+# Python environment
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Local archive / old experiments
+_local_archive/
+
+# Raw/private survey data
+data/raw/
+
+# Local tooling
+.qodo/
+.codex-slide1-build/
+.codex-slide1-output/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+data/processed/survey/*.xlsx

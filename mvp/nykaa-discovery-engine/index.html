@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wishlist Discovery Engine — Nykaa Fashion Case Study</title>
+<script src="./data/nykaa_discovery_bundle.js"></script>
+<style>
+  :root{
+    --denim:#A61F4B;
+    --denim-deep:#352336;
+    --paper:#FFFAF7;
+    --paper-raised:#FFFFFF;
+    --ink:#211D1B;
+    --ink-soft:#6D625E;
+    --thread:#D93567;
+    --thread-soft:#F0C2CE;
+    --gold:#9A5B16;
+    --gold-soft:#FFF8E9;
+    --stitch:#E9DED9;
+    --green:#276B57;
+    --green-soft:#EEF9F4;
+    --font-display: Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
+    --font-body: Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
+    --radius: 14px;
+  }
+  *{box-sizing:border-box;}
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+  }
+  body{
+    margin:0;
+    background:linear-gradient(180deg,#FFF8F5 0%,#FFFFFF 42%,#FDF4F1 100%);
+    color:var(--ink);
+    font-family:var(--font-body);
+    line-height:1.5;
+    padding:0 0 64px 0;
+  }
+  .wrap{max-width:1180px; margin:0 auto; padding:24px 20px 64px;}
+
+  /* Header */
+  header{margin-bottom:34px; padding:8px 0 26px; border-bottom:1px solid var(--stitch);}
+  .brand-lockup{display:flex; align-items:center; gap:9px; flex-wrap:wrap; margin-bottom:18px;}
+  .brand-name{font-size:19px; font-weight:900; letter-spacing:-.04em; color:var(--denim-deep);}
+  .brand-name span{color:var(--thread);}
+  .brand-divider{color:var(--stitch); font-size:20px; line-height:1;}
+  .brand-product{font-size:11px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--denim);}
+  .case-study-label{font-size:10px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); background:var(--paper); border:1px solid var(--stitch); border-radius:999px; padding:4px 9px;}
+  .eyebrow{
+    font-size:11px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--thread);
+    display:flex; align-items:center; gap:8px;
+  }
+  .eyebrow::before{content:""; width:18px; height:2px; background:var(--thread); border-radius:2px;}
+  h1{
+    font-weight:700;
+    font-size:clamp(28px,3.6vw,42px);
+    line-height:1.2;
+    letter-spacing:-.045em;
+    margin:10px 0 10px 0;
+    color:var(--denim-deep);
+  }
+  header p{max-width:68ch; color:var(--ink-soft); margin:0; font-size:14px;}
+
+  .stitchline{
+    border:none;
+    border-top:1.5px dashed var(--stitch);
+    margin:26px 0;
+  }
+
+  /* Panels */
+  .panel{
+    background:var(--paper-raised);
+    border:1px solid var(--stitch);
+    border-radius:var(--radius);
+    padding:24px;
+    margin-bottom:24px;
+    box-shadow:0 12px 28px rgba(53,35,54,.06);
+  }
+  .panel h2{
+    font-family:var(--font-display);
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    margin:0 0 14px 0;
+    color:var(--denim);
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    flex-wrap:wrap;
+  }
+  .count-pill{
+    font-size:11px;
+    background:#FFF0F4;
+    color:var(--denim);
+    border:1px solid var(--thread-soft);
+    padding:2px 8px;
+    border-radius:20px;
+  }
+
+  /* Input row */
+  .input-grid{display:grid; grid-template-columns:140px 1fr; gap:10px; margin-bottom:10px;}
+  select, textarea, input[type="text"]{
+    font-size:14px;
+    border:1px solid var(--stitch);
+    border-radius:10px;
+    background:#fff;
+    color:var(--ink);
+    padding:9px 10px;
+  }
+  textarea{width:100%; min-height:74px; resize:vertical;}
+  select{height:100%;}
+  textarea:focus, select:focus, input:focus, button:focus-visible{
+    outline:3px solid var(--thread-soft); outline-offset:2px;
+  }
+  label.sr{
+    position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0);
+  }
+
+  .btnrow{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;}
+  button{
+    font-size:12.5px;
+    font-weight:800;
+    letter-spacing:0.03em;
+    text-transform:uppercase;
+    border-radius:10px;
+    border:1px solid var(--thread);
+    background:var(--thread);
+    color:#fff;
+    padding:10px 16px;
+    cursor:pointer;
+    transition:transform .12s ease, background .15s ease, box-shadow .15s ease;
+  }
+  button:hover:not(:disabled){transform:translateY(-1px); box-shadow:0 8px 18px rgba(217,53,103,.16);}
+  button:disabled{opacity:0.45; cursor:not-allowed;}
+  button.secondary{background:#fff; color:var(--denim); border-color:var(--thread-soft);}
+  button.ghost{background:transparent; color:var(--ink-soft); border-color:var(--stitch);}
+  button.primary{background:var(--thread); border-color:var(--thread);}
+
+  /* Snippet chips */
+  .chiplist{display:flex; flex-direction:column; gap:8px; margin-top:14px;}
+  .chip{
+    display:flex; align-items:flex-start; gap:10px;
+    background:#fff; border:1px solid var(--stitch); border-radius:12px;
+    padding:10px 12px; font-size:13px;
+  }
+  .chip .src{
+    font-size:10px; text-transform:uppercase; font-weight:800;
+    background:#FFF0F4; color:var(--denim); padding:3px 7px; border-radius:999px;
+    white-space:nowrap; flex-shrink:0; margin-top:1px;
+  }
+  .chip p{margin:0; flex:1; color:var(--ink-soft);}
+  .chip button{padding:2px 8px; font-size:10px; background:transparent; color:var(--thread); border-color:var(--thread-soft);}
+
+  /* Funnel */
+  .funnel{display:flex; gap:0; align-items:stretch; font-family:var(--font-display); font-size:12px;}
+  .funnel .stage{flex:1; text-align:center; padding:12px 6px; border-right:1.5px dashed var(--stitch);}
+  .funnel .stage:last-child{border-right:none;}
+  .funnel .stage .n{font-size:22px; font-weight:700; color:var(--denim-deep); display:block;}
+  .funnel .stage .lbl{color:var(--ink-soft); text-transform:uppercase; letter-spacing:.05em; font-size:10px;}
+
+  /* Bars */
+  .barrow{margin-bottom:11px;}
+  .barrow .toprow{display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;}
+  .barrow .toprow .label{color:var(--ink);}
+  .barrow .toprow .pct{font-family:var(--font-display); color:var(--denim-deep); font-weight:700;}
+  .track{height:9px; background:#F3EAE6; border-radius:5px; overflow:hidden;}
+  .fill{height:100%; background:var(--thread); border-radius:5px; transition:width .5s ease;}
+  .fill.thread{background:var(--thread);}
+  .fill.gold{background:var(--gold);}
+  .fill.green{background:var(--green);}
+  .footnote{font-size:11.5px; color:var(--ink-soft); margin-top:6px; font-style:italic;}
+  .notice{background:var(--gold-soft); border-left:4px solid var(--gold); border-radius:10px; padding:10px 12px; font-size:12.5px; color:#754A17; margin-bottom:14px;}
+  .notice strong{font-family:var(--font-display); text-transform:uppercase; font-size:10px; letter-spacing:.05em;}
+  .dataset-status{display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap; background:#FFF5F8; border:1px solid #F0C2CE; border-radius:14px; padding:16px 18px; margin:18px 0 22px;}
+  .dataset-status[data-state="error"]{background:#FFF8E9; border-color:#F0DDB6;}
+  .dataset-status[data-state="loading"]{background:#FFFCFB; border-color:var(--stitch);}
+  .dataset-status h3{margin:3px 0 3px; font-size:18px; letter-spacing:-.02em; color:var(--denim-deep);}
+  .dataset-status p{margin:0; font-size:12px; color:var(--ink-soft);}
+  .dataset-stats{display:flex; gap:16px; flex-wrap:wrap; align-items:center;}
+  .dataset-stat{text-align:center; min-width:58px;}
+  .dataset-stat .n{display:block; font-size:20px; font-weight:800; color:var(--denim);}
+  .dataset-stat .lbl{display:block; font-size:9px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); font-weight:800;}
+  .researcher-controls[hidden]{display:none !important;}
+  .filter-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px;}
+  .filter-grid label{font-family:var(--font-display); font-size:10px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-soft); display:flex; flex-direction:column; gap:4px;}
+  .filter-grid select{height:38px; min-height:38px;}
+  .funnel-wide{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:0; border:1px solid var(--stitch); border-radius:12px; overflow:hidden;}
+  .funnel-wide .stage{border-right:1px dashed var(--stitch); border-bottom:1px dashed var(--stitch); padding:10px 6px; text-align:center; font-family:var(--font-display);}
+  .funnel-wide .stage .n{font-size:19px; font-weight:700; color:var(--denim-deep); display:block;}
+  .funnel-wide .stage .lbl{font-size:9px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.03em;}
+  .pattern-table{width:100%; border-collapse:collapse; font-size:12px;}
+  .pattern-table th,.pattern-table td{border-bottom:1px solid #e0ddd4; padding:8px 6px; text-align:left; vertical-align:top;}
+  .pattern-table th{font-family:var(--font-display); text-transform:uppercase; font-size:9px; color:var(--ink-soft); letter-spacing:.04em;}
+  .pattern-table button,.trace-btn{padding:3px 6px; font-size:10px; background:transparent; color:var(--denim); border-color:var(--stitch); text-transform:none; margin:2px;}
+  .status-badge{display:inline-block; font-family:var(--font-display); font-size:9px; text-transform:uppercase; letter-spacing:.03em; padding:2px 5px; border-radius:8px; background:var(--gold-soft); color:#5c4413;}
+  .detail-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:8px 16px; margin-bottom:14px;}
+  .detail-grid dt{font-family:var(--font-display); text-transform:uppercase; font-size:9px; color:var(--ink-soft); margin-top:7px;}
+  .detail-grid dd{margin:1px 0 0; word-break:break-word;}
+  .raw-evidence{white-space:pre-wrap; background:#FFFCFB; border:1px solid var(--stitch); border-radius:10px; padding:12px; font-size:13px;}
+  .small-label{font-family:var(--font-display); text-transform:uppercase; letter-spacing:.04em; font-size:9px; color:var(--ink-soft);}
+  .tag{cursor:pointer;}
+  code{font-family:var(--font-display); font-size:11px;}
+  .review-form{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:10px 14px;}
+  .review-form label{font-family:var(--font-display); font-size:10px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-soft); display:flex; flex-direction:column; gap:4px;}
+  .review-form textarea{min-height:84px; grid-column:1/-1;}
+  .review-counters{display:grid; grid-template-columns:repeat(auto-fit,minmax(100px,1fr)); gap:8px; margin-bottom:14px;}
+  .review-counter{background:#fff; border:1px solid var(--stitch); border-radius:10px; padding:8px; text-align:center;}
+  .review-counter .n{display:block; font-family:var(--font-display); font-size:20px; font-weight:700; color:var(--denim-deep);}
+  .review-counter .lbl{font-family:var(--font-display); font-size:9px; text-transform:uppercase; color:var(--ink-soft);}
+  .review-actions{display:flex; flex-wrap:wrap; gap:8px; align-items:center;}
+  .review-actions button{padding:8px 11px; font-size:10px;}
+  .review-summary{font-size:12px; color:var(--ink-soft); background:#FFFCFB; border:1px solid var(--stitch); border-radius:10px; padding:10px; white-space:pre-wrap;}
+  .section-heading{margin:38px 0 14px; padding-left:14px; border-left:3px solid var(--thread);}
+  .section-heading .section-number{color:var(--thread); font-size:10px; letter-spacing:.12em; font-weight:800;}
+  .section-heading h2{font-size:20px; letter-spacing:-.025em; margin:3px 0 3px; color:var(--denim-deep);}
+  .section-heading p,.section-description{font-size:13px; color:var(--ink-soft); margin:0; max-width:72ch;}
+  .guide{margin-top:24px; background:#fff; border:1px solid var(--stitch); border-radius:14px; padding:16px 18px; box-shadow:0 8px 22px rgba(53,35,54,.04);}
+  .guide-title{text-transform:uppercase; letter-spacing:.06em; font-size:11px; font-weight:800; color:var(--denim); margin-bottom:9px;}
+  .guide-steps{display:grid; grid-template-columns:repeat(5,1fr); gap:8px; counter-reset:guide;}
+  .guide-step{font-size:11.5px; color:var(--ink-soft); padding-right:8px; border-right:1px dashed var(--stitch);}
+  .guide-step:last-child{border-right:none;}
+  .guide-step::before{counter-increment:guide; content:counter(guide); display:block; font-family:var(--font-display); color:var(--thread); font-weight:700; margin-bottom:2px;}
+  .subsection-title{font-size:12px; text-transform:uppercase; letter-spacing:.07em; font-weight:800; color:var(--denim); margin:0 0 8px;}
+  details.advanced{margin-top:14px; border-top:1px dashed var(--stitch); padding-top:12px;}
+  details.advanced summary{cursor:pointer; color:var(--ink-soft); font-family:var(--font-display); font-size:10px; text-transform:uppercase; letter-spacing:.05em;}
+  details.advanced[open] summary{color:var(--denim); margin-bottom:12px;}
+  .filter-label{display:flex; align-items:center; gap:5px;}
+  .info-icon{display:inline-flex; align-items:center; justify-content:center; width:14px; height:14px; border:1px solid var(--stitch); border-radius:50%; font-family:var(--font-display); font-size:9px; color:var(--denim); cursor:help; position:relative;}
+  .info-icon:hover::after,.info-icon:focus-visible::after{content:attr(data-tooltip); position:absolute; z-index:5; left:18px; top:-5px; width:190px; padding:7px 8px; background:var(--denim-deep); color:var(--paper); font-family:var(--font-body); font-size:11px; line-height:1.35; text-transform:none; letter-spacing:0; border-radius:3px; box-shadow:0 4px 12px rgba(0,0,0,.16);}
+  .ai-interpretation{background:#fff; border-left:4px solid var(--gold); padding:12px 14px; margin:12px 0 16px; font-size:13px; color:var(--ink);}
+  .ai-interpretation strong{display:block; font-family:var(--font-display); font-size:10px; text-transform:uppercase; letter-spacing:.05em; color:#5c4413; margin-bottom:5px;}
+  .review-context{background:#f3f1eb; padding:9px 12px; margin:10px 0; font-size:12px; color:var(--ink-soft);}
+  .review-context strong{font-family:var(--font-display); text-transform:uppercase; font-size:9px; letter-spacing:.05em; color:var(--denim); margin-right:6px;}
+  .review-primary-actions{display:flex; gap:10px; flex-wrap:wrap; margin:12px 0 4px;}
+  .review-primary-actions button{font-size:11px; padding:11px 14px;}
+  .edit-classification{margin-top:14px; padding-top:14px; border-top:1px dashed var(--stitch);}
+  @media (max-width:700px){.guide-steps{grid-template-columns:1fr 1fr;}.guide-step:nth-child(2n){border-right:none;}.panel{padding:18px;}.info-icon:hover::after,.info-icon:focus-visible::after{left:auto;right:0;top:18px;}}
+
+  /* Tag cards */
+  .rack{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px; margin-top:6px;}
+  .tag{
+    position:relative;
+    background:#fff;
+    border:1px solid var(--stitch);
+    border-radius:14px;
+    padding:16px 14px 14px 14px;
+    font-size:12.5px;
+  }
+  .tag::before{
+    content:"";
+    position:absolute; top:10px; left:10px;
+    width:9px; height:9px; border-radius:50%;
+    background:var(--paper); border:1.5px solid var(--stitch);
+  }
+  .tag.barrier-price{border-left:4px solid var(--gold);}
+  .tag.barrier-trust{border-left:4px solid var(--thread);}
+  .tag.barrier-fit{border-left:4px solid var(--denim);}
+  .tag.barrier-styling{border-left:4px solid var(--green);}
+  .tag.barrier-compare{border-left:4px solid #7c5aa6;}
+  .tag.barrier-bookmark{border-left:4px solid var(--ink-soft);}
+  .tag.barrier-forgot{border-left:4px solid var(--stitch);}
+  .tag.barrier-unclear, .tag.failed{border-left:4px solid #cfc9ba; opacity:0.75;}
+  .tag h3{
+    font-size:11px; text-transform:uppercase; font-weight:800;
+    letter-spacing:.03em; margin:6px 0 8px 22px; color:var(--denim-deep);
+  }
+  .tag dl{margin:0 0 0 4px;}
+  .tag dt{font-family:var(--font-display); font-size:9.5px; text-transform:uppercase; color:var(--ink-soft); margin-top:7px;}
+  .tag dd{margin:1px 0 0 0; color:var(--ink);}
+  .tag .quote{font-style:italic; color:var(--ink-soft); margin-top:8px; border-top:1px dashed var(--stitch); padding-top:8px;}
+  .tag .src-badge{
+    position:absolute; top:10px; right:10px;
+    font-size:9px; text-transform:uppercase; font-weight:800;
+    background:#FFF8F5; border:1px solid var(--stitch); color:var(--ink-soft);
+    padding:2px 6px; border-radius:10px;
+  }
+
+  .empty{
+    text-align:center; padding:34px 12px; color:var(--ink-soft); font-size:13.5px;
+    border:1px dashed var(--stitch); border-radius:14px; background:#fff;
+  }
+
+  .spin{
+    display:inline-block; width:11px; height:11px; border-radius:50%;
+    border:2px solid var(--paper); border-top-color:transparent;
+    animation:spin .7s linear infinite; margin-right:6px; vertical-align:-1px;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .toast{
+    position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+    background:var(--denim-deep); color:#fff;
+    font-size:12px; padding:9px 16px; border-radius:20px; opacity:0; pointer-events:none;
+    transition:opacity .2s ease;
+  }
+  .toast.show{opacity:1;}
+
+  footer{margin-top:30px; font-size:12px; color:var(--ink-soft); text-align:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand-lockup"><span class="brand-name">nykaa <span>fashion</span></span><span class="brand-divider">/</span><span class="brand-product">Wishlist Discovery Engine</span><span class="case-study-label">Case-study prototype</span></div>
+    <div class="eyebrow">Wishlist &rarr; Purchase · AI-powered research workspace</div>
+    <h1>Find out why wishlist intent never became a purchase.</h1>
+    <p>Load provenance-aware research records, inspect candidate classifications, and trace candidate patterns back to source evidence. Automated evidence validation runs locally; human audit remains a separate review path.</p>
+    <div class="guide">
+      <div class="guide-title">How it works</div>
+      <div class="guide-steps">
+        <div class="guide-step">Load research</div>
+        <div class="guide-step">Explore evidence</div>
+        <div class="guide-step">Review candidate patterns</div>
+        <div class="guide-step">Validate selected records</div>
+        <div class="guide-step">Export the audit trail</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="section-heading">
+    <span class="section-number">01 · RESEARCH OVERVIEW</span>
+    <h2>Load the evidence set</h2>
+    <p>The case-study pilot is loaded automatically for review. Raw and pilot data stay outside this interface.</p>
+  </div>
+  <div class="panel">
+    <h2>Research overview</h2>
+    <p class="section-description">The existing pilot is loaded automatically from the embedded case-study bundle without an API call. Manual imports remain available as a recovery path.</p>
+    <div class="dataset-status" id="pilotDatasetStatus" data-state="loading" aria-live="polite">
+      <div><span class="small-label">Case-study research state</span><h3 id="pilotDatasetTitle">Loading pilot dataset…</h3><p id="pilotDatasetMessage">Reading the existing pilot, classifications, and human validation files.</p></div>
+      <div class="dataset-stats" id="pilotDatasetStats"><div class="dataset-stat"><span class="n">—</span><span class="lbl">Evidence units</span></div></div>
+    </div>
+    <div class="btnrow" style="justify-content:flex-end; margin-top:0;">
+      <button id="advancedControlsToggle" class="ghost" type="button" aria-expanded="false" aria-controls="advancedControls analysisControls">Advanced / import dataset</button>
+    </div>
+    <div id="advancedControls" class="researcher-controls" hidden>
+    <h2 style="font-family:var(--font-display); font-size:13px; text-transform:uppercase; letter-spacing:.08em; color:var(--denim); margin:18px 0 12px 0;">Researcher controls</h2>
+    <span class="count-pill" id="rackCount" hidden>Evidence units</span>
+    <h3 class="subsection-title" style="margin-top:18px;">Add source text</h3>
+    <div class="input-grid">
+      <div>
+        <label class="sr" for="srcSelect">Source</label>
+        <select id="srcSelect">
+          <option>Reddit</option>
+          <option>App Store</option>
+          <option>Play Store</option>
+          <option>YouTube comment</option>
+          <option>Fashion community</option>
+          <option>Social media</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div>
+        <label class="sr" for="snippetText">Paste text</label>
+        <textarea id="snippetText" placeholder="Paste one review, comment, or thread reply here…"></textarea>
+      </div>
+    </div>
+    <div class="btnrow">
+      <button id="addBtn">+ Add to rack</button>
+      <button id="seedBtn" class="secondary">Load 6 example snippets</button>
+      <button id="clearBtn" class="ghost">Clear rack</button>
+    </div>
+    <div class="chiplist" id="chipList"></div>
+
+    <hr class="stitchline">
+
+    <details class="advanced">
+    <summary>Advanced: bulk import or classify manually</summary>
+    <h2 style="font-family:var(--font-display); font-size:13px; text-transform:uppercase; letter-spacing:.08em; color:var(--denim); margin:0 0 12px 0;">Bulk import a scraped CSV</h2>
+    <p style="font-size:13px; color:var(--ink-soft); margin:0 0 12px 0;">Needs columns named <code>text</code> and optionally <code>source</code> and <code>relevance</code> — this matches the output of the scraper script directly.</p>
+    <div class="input-grid">
+      <div>
+        <label class="sr" for="csvLimit">Rows to import</label>
+        <input type="text" id="csvLimit" value="30" inputmode="numeric" placeholder="30">
+      </div>
+      <div>
+        <label class="sr" for="csvFile">CSV file</label>
+        <input type="file" id="csvFile" accept=".csv,text/csv">
+      </div>
+    </div>
+    <div class="btnrow">
+      <button id="importBtn" class="secondary">Import top rows</button>
+      <span id="importStatus" style="font-family:var(--font-display); font-size:12px; color:var(--ink-soft); align-self:center;"></span>
+    </div>
+    </details>
+
+    <hr class="stitchline">
+
+    <h2 style="font-family:var(--font-display); font-size:13px; text-transform:uppercase; letter-spacing:.08em; color:var(--denim); margin:0 0 12px 0;">Optional: replace the pilot output</h2>
+    <p style="font-size:13px; color:var(--ink-soft); margin:0 0 12px 0;">The case-study pilot loads automatically over HTTP/HTTPS. Use this local control only to replace it with another compatible classification CSV.</p>
+    <div class="input-grid">
+      <div><span class="small-label">Pilot CSV</span></div>
+      <div><label class="sr" for="pilotFile">Pilot classification CSV</label><input type="file" id="pilotFile" accept=".csv,text/csv"></div>
+    </div>
+    <div class="btnrow">
+      <button id="loadPilotBtn" class="secondary">Load another dataset</button>
+      <span id="pilotStatus" style="font-family:var(--font-display); font-size:12px; color:var(--ink-soft); align-self:center;"></span>
+    </div>
+    <details class="advanced">
+      <summary>Advanced: optional local API classification</summary>
+      <div class="btnrow" style="margin-top:10px; align-items:center;">
+        <label class="small-label" for="apiKey">Optional local API key</label>
+        <input type="password" id="apiKey" placeholder="Not saved; local testing only" autocomplete="off" style="min-width:260px;">
+        <span class="footnote" style="margin:0;">A secure backend is required for public deployment.</span>
+      </div>
+    </details>
+    </div>
+  </div>
+
+  <div id="analysisControls" class="btnrow researcher-controls" hidden style="margin-bottom:20px;">
+    <button id="analyzeBtn" class="primary" disabled>Analyze the rack</button>
+    <span id="statusText" style="font-family:var(--font-display); font-size:12px; color:var(--ink-soft); align-self:center;"></span>
+  </div>
+
+  <div id="resultsArea" style="display:none;">
+
+    <div class="section-heading">
+      <span class="section-number">02 · EVIDENCE EXPLORER</span>
+      <h2>Inspect the research records</h2>
+      <p>Filter the loaded evidence set, open a record to inspect its provenance, and keep contextual evidence separate from direct wishlist behaviour.</p>
+    </div>
+
+    <div class="notice"><strong>Evidence status</strong> <span id="evidenceStatus">UNKNOWN</span> — automated validation is separate from human audit. Ambiguous records remain flagged, and human review status is never inferred.</div>
+
+    <div class="panel">
+      <h2>Research synthesis filters <span class="count-pill" id="filteredCount">0 visible</span></h2>
+      <div class="filter-grid">
+        <label><span class="filter-label">Evidence tier <span class="info-icon" tabindex="0" data-tooltip="A proposed directness lens for prioritising evidence.">i</span></span><select id="filterTier"><option value="">All tiers</option></select></label>
+        <label><span class="filter-label">Evidence type <span class="info-icon" tabindex="0" data-tooltip="Identifies what kind of evidence this record contains.">i</span></span><select id="filterEvidenceType"><option value="">All evidence types</option></select></label>
+        <label><span class="filter-label">Wishlist linkage <span class="info-icon" tabindex="0" data-tooltip="Shows how directly the evidence connects to wishlist behaviour.">i</span></span><select id="filterWishlist"><option value="">All linkage</option></select></label>
+        <label><span class="filter-label">Journey stage <span class="info-icon" tabindex="0" data-tooltip="Shows where this evidence occurs in the shopping journey.">i</span></span><select id="filterJourney"><option value="">All stages</option></select></label>
+        <label><span class="filter-label">Primary intent <span class="info-icon" tabindex="0" data-tooltip="Describes apparent shopping intent based only on the evidence.">i</span></span><select id="filterIntent"><option value="">All intents</option></select></label>
+        <label><span class="filter-label">Barrier <span class="info-icon" tabindex="0" data-tooltip="A purchase barrier only when supported by the evidence.">i</span></span><select id="filterBarrier"><option value="">All barriers</option></select></label>
+        <label><span class="filter-label">Source <span class="info-icon" tabindex="0" data-tooltip="The originating research source for this record.">i</span></span><select id="filterSource"><option value="">All sources</option></select></label>
+        <label><span class="filter-label">Review status <span class="info-icon" tabindex="0" data-tooltip="Whether a human reviewer has saved an adjudication.">i</span></span><select id="filterReview"><option value="">All statuses</option></select></label>
+      </div>
+      <div class="btnrow"><button id="clearFilters" class="ghost">Clear filters</button></div>
+    </div>
+
+    <div class="section-heading">
+      <span class="section-number">03 · DISCOVERY FINDINGS</span>
+      <h2>Review candidate patterns</h2>
+      <p>Counts and themes are generated from the validated evidence layer. They remain supported patterns or hypotheses, not a final problem statement or solution.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Evidence funnel</h2>
+      <div class="funnel-wide" id="evidenceFunnel"></div>
+      <p class="footnote">Counts are generated from loaded records. “Patterns” and “problem hypotheses” are analytic candidates, not validated findings.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Candidate barrier distribution</h2>
+      <div id="barrierBars"></div>
+      <p class="footnote" id="barrierFoot"></p>
+    </div>
+
+    <div class="panel">
+      <h2>Candidate primary intent</h2>
+      <div id="intentBars"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Category mix</h2>
+      <div id="categoryBars"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Evidence records <span class="count-pill" id="tagCount">0</span></h2>
+      <div class="rack" id="tagRack"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Traceable candidate patterns</h2>
+      <div id="patternTable"></div>
+      <p class="footnote">A multi-source pattern is a traceable signal from automatically validated records; ambiguous records remain excluded or flagged. No final problem or solution is generated.</p>
+    </div>
+
+    <div class="panel" id="detailPanel" style="display:none;">
+      <h2>Evidence inspection <span class="count-pill" id="detailStatus">UNKNOWN</span></h2>
+      <details class="advanced">
+        <summary>Show provenance and technical details</summary>
+        <dl class="detail-grid" id="detailGrid"></dl>
+      </details>
+      <div class="small-label">Raw evidence</div>
+      <div class="raw-evidence" id="detailRaw"></div>
+    </div>
+
+    <div class="section-heading">
+      <span class="section-number">04 · HUMAN AUDIT</span>
+      <h2>Audit a focused set of records</h2>
+      <p>Read the evidence, assess the candidate interpretation, and review only the strategically selected records that need human judgement.</p>
+    </div>
+
+    <div class="panel" id="adjudicationPanel" style="display:none;">
+      <h2>Human adjudication <span class="count-pill" id="reviewTarget">No record selected</span></h2>
+      <div class="raw-evidence" id="reviewRawEvidence">Select a record from Evidence Explorer to begin.</div>
+      <div class="review-context" id="reviewContext"><strong>Question / context</strong> Select a record to see its research field and source context.</div>
+      <div class="ai-interpretation" id="aiInterpretation"><strong>AI interpretation</strong><span id="aiInterpretationText">Candidate labels will appear here after you select a record.</span></div>
+      <p class="section-description">Does the AI interpretation match the evidence? Confirm it, or edit only the fields that need correction.</p>
+      <div class="review-counters">
+        <div class="review-counter"><span class="n" id="reviewedCount">0</span><span class="lbl">Total reviewed</span></div>
+        <div class="review-counter"><span class="n" id="pendingCount">0</span><span class="lbl">Pending</span></div>
+        <div class="review-counter"><span class="n" id="confirmedCount">0</span><span class="lbl">Confirmed</span></div>
+        <div class="review-counter"><span class="n" id="correctedCount">0</span><span class="lbl">Corrected</span></div>
+        <div class="review-counter" style="display:none"><span class="n" id="includedCount">0</span><span class="lbl">Included</span></div>
+        <div class="review-counter" style="display:none"><span class="n" id="excludedCount">0</span><span class="lbl">Excluded</span></div>
+      </div>
+      <div class="review-primary-actions">
+        <button id="confirmClassification" class="primary">✓ Confirm — AI is correct</button>
+        <button id="editClassification" class="secondary">✎ Edit classification</button>
+      </div>
+      <div class="edit-classification" id="editClassificationPanel" style="display:none;">
+        <div class="small-label" style="margin-bottom:8px;">Edit only what is not supported by the evidence</div>
+      <div class="review-form">
+        <label>Evidence type<select id="humanEvidenceType">
+          <option value="direct_wishlist_behavior">direct_wishlist_behavior</option><option value="pre_purchase_hesitation">pre_purchase_hesitation</option><option value="general_shopping_friction">general_shopping_friction</option><option value="post_purchase_complaint">post_purchase_complaint</option><option value="competitor_product_context">competitor_product_context</option><option value="irrelevant_or_unclear">irrelevant_or_unclear</option>
+        </select></label>
+        <label>Wishlist linkage<select id="humanWishlistLink">
+          <option value="explicit_direct">explicit_direct</option><option value="explicit_pre_purchase">explicit_pre_purchase</option><option value="inferred_or_ambiguous">inferred_or_ambiguous</option><option value="not_mentioned">not_mentioned</option>
+        </select></label>
+        <label>Primary intent<select id="humanPrimaryIntent">
+          <option value="genuine_purchase_intent">genuine_purchase_intent</option><option value="bookmark_or_inspiration">bookmark_or_inspiration</option><option value="considering_or_waiting">considering_or_waiting</option><option value="unknown">unknown</option>
+        </select></label>
+        <label>Journey stage<select id="humanJourneyStage">
+          <option value="wishlist_addition">wishlist_addition</option><option value="wishlist_revisit">wishlist_revisit</option><option value="pre_purchase">pre_purchase</option><option value="purchase">purchase</option><option value="post_purchase">post_purchase</option><option value="general_shopping">general_shopping</option><option value="competitor_context">competitor_context</option><option value="unknown">unknown</option>
+        </select></label>
+        <label>Barrier<select id="humanBarrier">
+          <option value="value/price assessment">value/price assessment</option><option value="fit/size confidence">fit/size confidence</option><option value="quality/material confidence">quality/material confidence</option><option value="review/product-information confidence">review/product-information confidence</option><option value="trust/authenticity">trust/authenticity</option><option value="availability/stock">availability/stock</option><option value="comparison/alternative">comparison/alternative</option><option value="occasion/styling">occasion/styling</option><option value="deprioritization/memory">deprioritization/memory</option><option value="wishlist/UX discoverability">wishlist/UX discoverability</option><option value="other/unclear">other/unclear</option>
+        </select></label>
+        <label>Quantitative decision<select id="humanInclude"><option value="">No decision yet</option><option value="yes">Include</option><option value="no">Exclude</option></select></label>
+        <label>Reviewer notes<textarea id="reviewerNotes" placeholder="Document the reasoning for this human decision…"></textarea></label>
+      </div>
+      <div class="review-actions">
+        <button id="previousReview" class="ghost">Previous</button>
+        <button id="nextReview" class="ghost">Next</button>
+        <button id="reviewCurrent" class="ghost">Review current</button>
+        <button id="pendingOnly" class="ghost">Show only pending</button>
+        <button id="saveHumanReview" class="primary">Save correction</button>
+        <span id="reviewStatus" class="footnote" style="margin:0;"></span>
+      </div>
+      </div>
+    </div>
+
+    <div class="section-heading">
+      <span class="section-number">05 · AUDIT &amp; EXPORT</span>
+      <h2>Keep the evidence trail reviewable</h2>
+      <p>Review summaries and adjudication files are generated locally. Candidate labels, raw evidence, and provenance remain available for audit.</p>
+    </div>
+    <div class="panel" id="reviewSummaryPanel" style="display:none;">
+      <h2>Human review summary</h2>
+      <div class="review-summary" id="reviewSummary"></div>
+      <details class="advanced">
+        <summary>Show audit file controls</summary>
+        <div class="btnrow">
+          <button id="downloadAdjudication" class="secondary">Download human_adjudication.csv</button>
+          <label class="small-label" for="adjudicationFile">Load saved adjudication</label>
+          <input type="file" id="adjudicationFile" accept=".csv,text/csv">
+          <button id="loadAdjudication" class="ghost">Load adjudication</button>
+          <span id="adjudicationStatus" class="footnote" style="margin:0;"></span>
+        </div>
+      </details>
+    </div>
+
+    <details class="advanced">
+      <summary>Advanced: copy candidate classifications</summary>
+      <div class="btnrow">
+        <button id="csvBtn" class="secondary">Copy as CSV</button>
+        <button id="jsonBtn" class="secondary">Copy as JSON</button>
+      </div>
+    </details>
+
+  </div>
+
+  <div id="emptyState" class="empty" style="display:none;">Pilot research is not currently available. Use Advanced / import dataset as a recovery path.</div>
+
+  <footer>
+    These are AI-assisted classifications of the text you provide, not a market-representative sample. Spot-check a few tags against the source before citing exact percentages in your deck — and report the "Unclear/Failed" count alongside every percentage, the way the funnel above does.
+  </footer>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const STORE_KEY = 'nykaa-wishlist-engine-state-v2';
+let snippets = []; // {id, source, text}
+let results = [];  // {id, source, text, status:'pending'|'done'|'unclear'|'failed', ...fields}
+let nextId = 1;
+
+const els = {
+  srcSelect: document.getElementById('srcSelect'),
+  snippetText: document.getElementById('snippetText'),
+  addBtn: document.getElementById('addBtn'),
+  seedBtn: document.getElementById('seedBtn'),
+  clearBtn: document.getElementById('clearBtn'),
+  chipList: document.getElementById('chipList'),
+  rackCount: document.getElementById('rackCount'),
+  csvLimit: document.getElementById('csvLimit'),
+  csvFile: document.getElementById('csvFile'),
+  importBtn: document.getElementById('importBtn'),
+  importStatus: document.getElementById('importStatus'),
+  analyzeBtn: document.getElementById('analyzeBtn'),
+  statusText: document.getElementById('statusText'),
+  resultsArea: document.getElementById('resultsArea'),
+  emptyState: document.getElementById('emptyState'),
+  toast: document.getElementById('toast'),
+};
+
+const SEEDS = [
+  {source:'App Store', text:"I keep three or four kurtas sitting in my wishlist for weeks. I don't buy because last time the size chart was off and the return pickup took forever, so now I'm scared to commit to a size again."},
+  {source:'Reddit', text:"Saved a jacket I really liked but I'm waiting to see if it drops in price during the next sale before I actually buy it."},
+  {source:'Play Store', text:"Half my wishlist is stuff I saved just for outfit ideas, not things I actually plan to purchase. It's more like a moodboard for me."},
+  {source:'Fashion community', text:"I wishlist a dress and then go check the same brand on Instagram or ask in my group chat if anyone has tried it before I pull the trigger."},
+  {source:'YouTube comment', text:"Not sure the fabric will feel as good as it looks in photos, so I'm holding off buying the top I saved until I find someone who's reviewed the actual material."},
+  {source:'App Store', text:"Wishlisted a saree for a wedding next month but I'm still deciding if it's formal enough for the event, so it's just sitting there for now."},
+];
+
+function saveState(){
+  try{
+    window.storage.set(STORE_KEY, JSON.stringify({snippets, results, nextId}), false)
+      .catch(()=>{});
+  }catch(e){}
+}
+async function loadState(){
+  try{
+    const r = await window.storage.get(STORE_KEY, false);
+    if(r && r.value){
+      const data = JSON.parse(r.value);
+      snippets = data.snippets || [];
+      results = data.results || [];
+      nextId = data.nextId || 1;
+    }
+  }catch(e){ /* no saved state yet */ }
+  renderChips();
+  if(results.length){ els.resultsArea.style.display='block'; els.emptyState.style.display='none'; if(document.getElementById('fPasted')) renderResults(); }
+}
+
+function showToast(msg){
+  els.toast.textContent = msg;
+  els.toast.classList.add('show');
+  setTimeout(()=>els.toast.classList.remove('show'), 1800);
+}
+
+function renderChips(){
+  els.chipList.innerHTML = '';
+  snippets.forEach(s=>{
+    const div = document.createElement('div');
+    div.className = 'chip';
+    div.innerHTML = `<span class="src">${s.source}</span><p>${escapeHtml(s.text)}</p>`;
+    const btn = document.createElement('button');
+    btn.textContent = 'Remove';
+    btn.onclick = ()=>{ snippets = snippets.filter(x=>x.id!==s.id); renderChips(); saveState(); };
+    div.appendChild(btn);
+    els.chipList.appendChild(div);
+  });
+  els.rackCount.textContent = snippets.length + ' in rack';
+  els.analyzeBtn.disabled = snippets.length === 0;
+}
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+els.addBtn.onclick = ()=>{
+  const text = els.snippetText.value.trim();
+  if(!text) return;
+  snippets.push({id: nextId++, source: els.srcSelect.value, text});
+  els.snippetText.value = '';
+  renderChips();
+  saveState();
+};
+
+els.seedBtn.onclick = ()=>{
+  SEEDS.forEach(s=> snippets.push({id: nextId++, source: s.source, text: s.text}));
+  renderChips();
+  saveState();
+  showToast('6 example snippets added');
+};
+
+els.clearBtn.onclick = ()=>{
+  snippets = [];
+  renderChips();
+  saveState();
+};
+
+function parseCSV(text){
+  // Handles quoted fields, commas inside quotes, and "" escaped quotes.
+  const rows = [];
+  let row = [], field = '', inQuotes = false;
+  for(let i=0; i<text.length; i++){
+    const c = text[i], next = text[i+1];
+    if(inQuotes){
+      if(c === '"' && next === '"'){ field += '"'; i++; }
+      else if(c === '"'){ inQuotes = false; }
+      else { field += c; }
+    } else {
+      if(c === '"'){ inQuotes = true; }
+      else if(c === ','){ row.push(field); field=''; }
+      else if(c === '\n'){ row.push(field); rows.push(row); row=[]; field=''; }
+      else if(c === '\r'){ /* skip */ }
+      else { field += c; }
+    }
+  }
+  if(field.length || row.length){ row.push(field); rows.push(row); }
+  if(!rows.length) return [];
+  const headers = rows[0].map(h=>h.trim().toLowerCase());
+  return rows.slice(1).filter(r=>r.length>1 || (r[0]&&r[0].trim())).map(r=>{
+    const obj = {};
+    headers.forEach((h,idx)=> obj[h] = (r[idx]||'').trim());
+    return obj;
+  });
+}
+
+els.importBtn.onclick = ()=>{
+  const file = els.csvFile.files[0];
+  if(!file){ els.importStatus.textContent = 'Choose a CSV file first.'; return; }
+  const limit = Math.max(1, parseInt(els.csvLimit.value,10) || 30);
+  const reader = new FileReader();
+  reader.onload = (e)=>{
+    const parsed = parseCSV(e.target.result);
+    const usable = parsed.filter(r=> r.text && r.text.length > 3);
+    const toAdd = usable.slice(0, limit);
+    toAdd.forEach(r=>{
+      snippets.push({
+        id: nextId++,
+        source: r.source || 'Imported',
+        text: r.text
+      });
+    });
+    renderChips();
+    saveState();
+    els.importStatus.textContent = `Imported ${toAdd.length} of ${usable.length} usable rows (${parsed.length} total in file).`;
+    showToast(`${toAdd.length} rows added to rack`);
+  };
+  reader.readAsText(file);
+};
+
+const SYSTEM_PROMPT = `You are a research analyst tagging user-generated text for a product case study about why fashion-app wishlist items don't convert to purchase.
+
+Read the snippet and respond with ONLY a JSON object, no markdown fences, no preamble, matching exactly this shape:
+{
+  "barrier": one of ["Price / Value Uncertainty","Fit, Size or Quality Doubt","Trust / Authenticity Concern","Styling or Occasion Uncertainty","Comparison Shopping","Bookmark Only, No Real Intent","Forgot / Deprioritized","Other","Unclear"],
+  "discovery_trigger": one of ["Push Notification","Price Drop Alert","Search Revisit","Social or Influencer Prompt","Browsing Wishlist Directly","Not Mentioned"],
+  "underlying_need": "5-8 word phrase describing what would unblock the purchase",
+  "category": one of ["Apparel","Footwear","Accessories","Beauty or Personal Care","Other or Unclear"],
+  "intent_signal": one of ["Genuine Purchase Intent","Bookmark or Inspiration Only","Unclear"],
+  "evidence_note": "a short paraphrase under 12 words, in your own words, not a direct quote",
+  "confidence": one of ["High","Medium","Low"]
+}
+
+If the snippet does not contain enough signal to classify confidently, use "Unclear" for barrier and intent_signal rather than guessing. Never invent details not present in the text.`;
+
+async function classifyOne(snippet){
+  try{
+    const resp = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1000,
+        system: SYSTEM_PROMPT,
+        messages: [{role:"user", content: `Source: ${snippet.source}\nSnippet: """${snippet.text}"""`}]
+      })
+    });
+    const data = await resp.json();
+    const textBlock = (data.content || []).find(c=>c.type==='text');
+    if(!textBlock) throw new Error('no text block');
+    let clean = textBlock.text.trim().replace(/^```json/,'').replace(/^```/,'').replace(/```$/,'').trim();
+    const parsed = JSON.parse(clean);
+    return {...snippet, ...parsed, status: (parsed.barrier==='Unclear' ? 'unclear' : 'done')};
+  }catch(e){
+    // one retry
+    try{
+      const resp2 = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({
+          model:"claude-sonnet-4-6",
+          max_tokens:1000,
+          system: SYSTEM_PROMPT + "\n\nReturn ONLY valid JSON, nothing else.",
+          messages:[{role:"user", content:`Source: ${snippet.source}\nSnippet: """${snippet.text}"""`}]
+        })
+      });
+      const data2 = await resp2.json();
+      const tb2 = (data2.content||[]).find(c=>c.type==='text');
+      let clean2 = tb2.text.trim().replace(/^```json/,'').replace(/^```/,'').replace(/```$/,'').trim();
+      const parsed2 = JSON.parse(clean2);
+      return {...snippet, ...parsed2, status:(parsed2.barrier==='Unclear'?'unclear':'done')};
+    }catch(e2){
+      return {...snippet, status:'failed'};
+    }
+  }
+}
+
+els.analyzeBtn.onclick = async ()=>{
+  els.analyzeBtn.disabled = true;
+  els.resultsArea.style.display = 'block';
+  els.emptyState.style.display = 'none';
+  results = snippets.map(s=>({...s, status:'pending'}));
+  renderResults();
+
+  for(let i=0;i<snippets.length;i++){
+    els.statusText.innerHTML = `<span class="spin"></span>Classifying ${i+1} of ${snippets.length}…`;
+    const r = await classifyOne(snippets[i]);
+    results[i] = r;
+    renderResults();
+    saveState();
+  }
+  els.statusText.textContent = 'Done.';
+  els.analyzeBtn.disabled = false;
+};
+
+function pct(n, d){ return d>0 ? Math.round((n/d)*1000)/10 : 0; }
+
+function barrierClass(b){
+  const map = {
+    'Price / Value Uncertainty':'price',
+    'Fit, Size or Quality Doubt':'fit',
+    'Trust / Authenticity Concern':'trust',
+    'Styling or Occasion Uncertainty':'styling',
+    'Comparison Shopping':'compare',
+    'Bookmark Only, No Real Intent':'bookmark',
+    'Forgot / Deprioritized':'forgot',
+  };
+  return map[b] || 'unclear';
+}
+
+function renderBars(container, counts, total, fillClass){
+  container.innerHTML = '';
+  Object.entries(counts).sort((a,b)=>b[1]-a[1]).forEach(([label,n])=>{
+    const p = pct(n,total);
+    const row = document.createElement('div');
+    row.className = 'barrow';
+    row.innerHTML = `
+      <div class="toprow"><span class="label">${label}</span><span class="pct">${p}% (${n})</span></div>
+      <div class="track"><div class="fill ${fillClass}" style="width:${p}%"></div></div>`;
+    container.appendChild(row);
+  });
+}
+
+function renderResults(){
+  const done = results.filter(r=>r.status==='done');
+  const unclear = results.filter(r=>r.status==='unclear');
+  const failed = results.filter(r=>r.status==='failed');
+
+  document.getElementById('fPasted').textContent = results.length;
+  document.getElementById('fClassified').textContent = done.length;
+  document.getElementById('fUnclear').textContent = unclear.length;
+  document.getElementById('fFailed').textContent = failed.length;
+
+  const barrierCounts = {};
+  done.forEach(r=> barrierCounts[r.barrier] = (barrierCounts[r.barrier]||0)+1 );
+  renderBars(document.getElementById('barrierBars'), barrierCounts, done.length, 'thread');
+  document.getElementById('barrierFoot').textContent =
+    `Barrier distribution among classified items (n=${done.length}); ${unclear.length + failed.length} unclear or failed, excluded.`;
+
+  const intentCounts = {};
+  done.forEach(r=> intentCounts[r.intent_signal] = (intentCounts[r.intent_signal]||0)+1 );
+  renderBars(document.getElementById('intentBars'), intentCounts, done.length, 'gold');
+
+  const catCounts = {};
+  done.forEach(r=> catCounts[r.category] = (catCounts[r.category]||0)+1 );
+  renderBars(document.getElementById('categoryBars'), catCounts, done.length, 'green');
+
+  document.getElementById('tagCount').textContent = results.length;
+  const rack = document.getElementById('tagRack');
+  rack.innerHTML = '';
+  results.forEach(r=>{
+    const div = document.createElement('div');
+    if(r.status==='pending'){
+      div.className = 'tag';
+      div.innerHTML = `<span class="src-badge">${r.source}</span><h3><span class="spin"></span>Classifying…</h3>`;
+    } else if(r.status==='failed'){
+      div.className = 'tag failed';
+      div.innerHTML = `<span class="src-badge">${r.source}</span><h3>Extraction failed</h3><dd style="margin-left:4px;">Could not parse a valid response — retry or check manually.</dd>`;
+    } else {
+      div.className = `tag barrier-${barrierClass(r.barrier)}`;
+      div.innerHTML = `
+        <span class="src-badge">${r.source}</span>
+        <h3>${escapeHtml(r.barrier)}</h3>
+        <dl>
+          <dt>Underlying need</dt><dd>${escapeHtml(r.underlying_need||'—')}</dd>
+          <dt>Category</dt><dd>${escapeHtml(r.category||'—')}</dd>
+          <dt>Wishlist intent</dt><dd>${escapeHtml(r.intent_signal||'—')}</dd>
+          <dt>Discovery trigger</dt><dd>${escapeHtml(r.discovery_trigger||'—')}</dd>
+          <dt>Confidence</dt><dd>${escapeHtml(r.confidence||'—')}</dd>
+        </dl>
+        <p class="quote">${escapeHtml(r.evidence_note||'')}</p>`;
+    }
+    rack.appendChild(div);
+  });
+}
+
+function toCSV(){
+  const headers = ['source','barrier','discovery_trigger','underlying_need','category','intent_signal','confidence','evidence_note'];
+  const rows = results.filter(r=>r.status!=='pending').map(r=>
+    headers.map(h=> `"${String(r[h]||'').replace(/"/g,'""')}"`).join(',')
+  );
+  return headers.join(',') + '\n' + rows.join('\n');
+}
+
+async function copyText(text, label){
+  try{
+    await navigator.clipboard.writeText(text);
+    showToast(label + ' copied to clipboard');
+  }catch(e){
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast(label + ' copied to clipboard');
+  }
+}
+
+document.getElementById('csvBtn').onclick = ()=> copyText(toCSV(), 'CSV');
+document.getElementById('jsonBtn').onclick = ()=> copyText(JSON.stringify(results.filter(r=>r.status!=='pending'), null, 2), 'JSON');
+
+window.__nykaaBaseStatePromise = loadState();
+</script>
+<script>
+(function(){
+  // v2 research-synthesis layer. The original input and visual shell remain intact;
+  // this layer adds provenance-aware pilot loading, filtering, inspection and tracing.
+  const q=id=>document.getElementById(id), V={
+    pilotFile:q('pilotFile'),loadPilotBtn:q('loadPilotBtn'),pilotStatus:q('pilotStatus'),apiKey:q('apiKey'),
+    advancedToggle:q('advancedControlsToggle'),advancedControls:q('advancedControls'),analysisControls:q('analysisControls'),
+    pilotDatasetStatus:q('pilotDatasetStatus'),pilotDatasetTitle:q('pilotDatasetTitle'),pilotDatasetMessage:q('pilotDatasetMessage'),pilotDatasetStats:q('pilotDatasetStats'),
+    resultsArea:q('resultsArea'),emptyState:q('emptyState'),evidenceStatus:q('evidenceStatus'),filteredCount:q('filteredCount'),
+    filterTier:q('filterTier'),filterEvidenceType:q('filterEvidenceType'),filterWishlist:q('filterWishlist'),filterJourney:q('filterJourney'),
+    filterIntent:q('filterIntent'),filterBarrier:q('filterBarrier'),filterSource:q('filterSource'),filterReview:q('filterReview'),clearFilters:q('clearFilters'),
+    funnel:q('evidenceFunnel'),barrierBars:q('barrierBars'),barrierFoot:q('barrierFoot'),intentBars:q('intentBars'),categoryBars:q('categoryBars'),
+    tagCount:q('tagCount'),tagRack:q('tagRack'),patternTable:q('patternTable'),detailPanel:q('detailPanel'),detailStatus:q('detailStatus'),detailGrid:q('detailGrid'),detailRaw:q('detailRaw')
+  };
+  const PROMPT_VERSION='v2.0-evidence-funnel';
+  const V2_PROMPT=`You are a research analyst producing a candidate, provenance-preserving classification for one research evidence unit in a case study about why fashion-app wishlist items do not convert to purchase within 30 days.
+
+Respond with ONLY one valid JSON object, no markdown fences, with exactly these fields: evidence_type, journey_stage, wishlist_link, primary_intent, outcome_signal, barrier_theme, secondary_theme, discovery_trigger, underlying_need, user_context, evidence_strength, pattern, problem_hypothesis, barrier, category, intent_signal, evidence_note, confidence.
+
+Allowed evidence_type values: direct_wishlist_behavior, pre_purchase_hesitation, general_shopping_friction, post_purchase_complaint, competitor_product_context, irrelevant_or_unclear.
+Allowed journey_stage values: wishlist_addition, wishlist_revisit, pre_purchase, purchase, post_purchase, general_shopping, competitor_context, unknown.
+Allowed wishlist_link values: explicit_direct, explicit_pre_purchase, inferred_or_ambiguous, not_mentioned.
+Allowed primary_intent values: genuine_purchase_intent, bookmark_or_inspiration, considering_or_waiting, unknown.
+Allowed outcome_signal values: purchased, considering_or_waiting, not_purchased_or_deprioritized, alternative_purchase, unavailable_or_out_of_stock, post_purchase_issue, unknown.
+Allowed barrier_theme values: value/price assessment, fit/size confidence, quality/material confidence, review/product-information confidence, trust/authenticity, availability/stock, comparison/alternative, occasion/styling, deprioritization/memory, wishlist/UX discoverability, other/unclear.
+Allowed evidence_strength values: direct, explicit_pre_purchase, contextual, inferred, insufficient.
+
+The barrier taxonomy is a hypothesis, not an established finding. Do not force a category. Do not treat general reviews or post-purchase complaints as proof of wishlist causality. Do not infer demographics or causality. Cross-source validation is not evaluated at item level. Human review status must remain pending and must never be fabricated. Use unknown, other/unclear, or not_evaluated when signal is insufficient. pattern and problem_hypothesis are candidates only, never a final problem statement or solution.`;
+  const val=(x,d='')=>x===null||x===undefined?d:String(x).trim();
+  if(V.advancedToggle){
+    V.advancedToggle.onclick=()=>{
+      const show=V.advancedControls.hidden;
+      V.advancedControls.hidden=!show;
+      V.analysisControls.hidden=!show;
+      V.advancedToggle.setAttribute('aria-expanded',String(show));
+      V.advancedToggle.textContent=show?'Close advanced controls':'Advanced / import dataset';
+    };
+  }
+  const esc=x=>{const d=document.createElement('div');d.textContent=val(x);return d.innerHTML;};
+  const isReviewed=r=>val(r.human_review_status)&&val(r.human_review_status)!=='pending';
+  const humanCorrection=r=>{if(!isReviewed(r)||!r.human_label)return false;try{const h=JSON.parse(r.human_label),checks=[['evidence_type','human_evidence_type'],['wishlist_link','human_wishlist_link'],['primary_intent','human_primary_intent'],['journey_stage','human_journey_stage'],['barrier_theme','human_barrier_theme']];return checks.some(([candidate,human])=>val(h[human]||h[candidate])&&val(h[human]||h[candidate])!==val(r[candidate]));}catch(e){return false;}};
+  function listValue(value){if(Array.isArray(value))return value.filter(Boolean).map(val);const text=val(value);if(!text)return[];try{const parsed=JSON.parse(text);if(Array.isArray(parsed))return parsed.filter(Boolean).map(val);}catch(e){}return text.split('|').map(x=>x.trim()).filter(Boolean);}
+  function validatedBarriers(r){const list=listValue(r.analysis_validated_barriers||r.validated_barriers);if(list.length)return list;const fallback=val(r.analysis_barrier_theme||r.validated_barrier_theme);return fallback&&fallback!=='other/unclear'?[fallback]:[];}
+  function evidenceType(r){return val(r.analysis_evidence_type||r.validated_evidence_type||r.evidence_type,'irrelevant_or_unclear');}
+  function wishlistLink(r){return val(r.analysis_wishlist_link||r.validated_wishlist_link||r.wishlist_link,'not_mentioned');}
+  function barrierTheme(r){return val(r.analysis_barrier_theme||r.validated_barrier_theme||r.barrier_theme||r.barrier||validatedBarriers(r)[0],'other/unclear');}
+  function primary(r){if(val(r.analysis_primary_intent))return val(r.analysis_primary_intent);if(val(r.validated_primary_intent))return val(r.validated_primary_intent);if(val(r.primary_intent))return val(r.primary_intent);if(val(r.intent_signal)==='Genuine Purchase Intent')return 'genuine_purchase_intent';if(val(r.intent_signal)==='Bookmark or Inspiration Only')return 'bookmark_or_inspiration';if(val(r.outcome_signal)==='considering_or_waiting')return 'considering_or_waiting';return 'unknown';}
+  function tier(r){const t=evidenceType(r),l=wishlistLink(r);if(t==='direct_wishlist_behavior'||(t==='pre_purchase_hesitation'&&l==='explicit_pre_purchase'))return 'Tier 1 — direct / pre-purchase';if(t==='pre_purchase_hesitation')return 'Tier 1 — pre-purchase';if(['general_shopping_friction','post_purchase_complaint','competitor_product_context'].includes(t))return 'Tier 2 — contextual';return 'Tier 3 — unclear / irrelevant';}
+  function normalize(r,i){const o={...r};o.record_id=val(r.record_id,`loaded_${i+1}`);o.id=o.record_id;o.raw_text=val(r.raw_text||r.text);o.text=o.raw_text;o.source=val(r.source,'Unknown source');o.status=val(r.human_review_status)==='pending'?'prelabel':val(r.status,'loaded');o.barrier_theme=val(r.barrier_theme||r.barrier,'other/unclear');o.barrier=val(r.barrier||r.barrier_theme,'other/unclear');o.primary_intent=primary(r);o.intent_signal=val(r.intent_signal,'Unclear');o.evidence_tier=tier(o);o.human_review_status=val(r.human_review_status,'pending');o.human_label=val(r.human_label);o.include_in_quantitative_analysis=val(r.include_in_quantitative_analysis);o.prompt_version=val(r.prompt_version,PROMPT_VERSION);o.classification_method=val(r.classification_method,'candidate classification');return o;}
+  function csv(text){
+    const cleaned=String(text||'').replace(/^\uFEFF/,'');
+    if(typeof parseCSV!=='function') throw new Error('CSV parser is unavailable in the existing engine.');
+    return parseCSV(cleaned);
+  }
+  function automatedValidationStats(rows){const counts={automatically_validated:0,automatically_corrected:0,ambiguous_needs_review:0};rows.forEach(r=>{const k=val(r.automated_validation_status);if(Object.prototype.hasOwnProperty.call(counts,k))counts[k]++;});return {...counts,human_reviewed:rows.filter(isReviewed).length};}
+  function setDatasetStatus(state,title,message,rows,reviewStats,validationStats){
+    if(!V.pilotDatasetStatus)return;
+    V.pilotDatasetStatus.dataset.state=state;V.pilotDatasetTitle.textContent=title;V.pilotDatasetMessage.textContent=message;
+    if(!rows){V.pilotDatasetStats.innerHTML='<div class="dataset-stat"><span class="n">—</span><span class="lbl">Evidence units</span></div>';return;}
+    const counts={};rows.forEach(r=>{const key=val(r.source,'Unknown');counts[key]=(counts[key]||0)+1;});
+    const order=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+    const reviewHtml=reviewStats?'<div class="dataset-stat"><span class="n">'+reviewStats.reviewed+'</span><span class="lbl">Human reviewed</span></div><div class="dataset-stat"><span class="n">'+reviewStats.confirmed+'</span><span class="lbl">Confirmed</span></div><div class="dataset-stat"><span class="n">'+reviewStats.corrected+'</span><span class="lbl">Human corrected</span></div><div class="dataset-stat"><span class="n">'+reviewStats.pending+'</span><span class="lbl">Human pending</span></div>':'';
+    const validationHtml=validationStats?'<div class="dataset-stat"><span class="n">'+validationStats.automatically_validated+'</span><span class="lbl">Auto validated</span></div><div class="dataset-stat"><span class="n">'+validationStats.automatically_corrected+'</span><span class="lbl">Auto corrected</span></div><div class="dataset-stat"><span class="n">'+validationStats.ambiguous_needs_review+'</span><span class="lbl">Auto ambiguous</span></div>':'';
+    V.pilotDatasetStats.innerHTML='<div class="dataset-stat"><span class="n">'+rows.length+'</span><span class="lbl">Evidence units</span></div>'+order.map(([source,n])=>'<div class="dataset-stat"><span class="n">'+n+'</span><span class="lbl">'+esc(source==='Play Store'?'Google Play':source)+'</span></div>').join('')+validationHtml+reviewHtml;
+  }
+  function bundledRows(){
+    const bundle=window.NYKAA_DISCOVERY_BUNDLE;
+    if(!bundle)throw new Error('Embedded research bundle is unavailable. Keep mvp/data/nykaa_discovery_bundle.js beside this HTML file.');
+    const names=['pilot_dataset','classification_output','automated_validation_output','human_adjudication'],missing=names.filter(name=>!Array.isArray(bundle[name])||!bundle[name].length);
+    if(missing.length)throw new Error(`Embedded research bundle is incomplete. Missing data arrays: ${missing.join(', ')}.`);
+    return {pilotRows:bundle.pilot_dataset,classRows:bundle.classification_output,validationRows:bundle.automated_validation_output,adjudicationRows:bundle.human_adjudication};
+  }
+  function humanReviewStats(rows){
+    const reviewed=rows.filter(r=>val(r.human_review_status)==='reviewed');
+    return {reviewed:reviewed.length,confirmed:reviewed.filter(r=>val(r.human_decision)==='confirmed').length,corrected:reviewed.filter(r=>val(r.human_decision)==='corrected').length,pending:Math.max(0,rows.length-reviewed.length)};
+  }
+  function mergePilotProvenance(classRows,pilotRows){
+    const byId=new Map(pilotRows.map(r=>[val(r.record_id),r]));
+    return classRows.map(r=>{const p=byId.get(val(r.record_id));return p?{...p,...r}:r;});
+  }
+  function mergeAdjudication(classRows,adjudicationRows){
+    const byId=new Map(classRows.map(r=>[val(r.record_id),r]));let applied=0;
+    adjudicationRows.forEach(s=>{
+      if(val(s.human_review_status)!=='reviewed')return;
+      const r=byId.get(val(s.record_id));if(!r)return;
+      Object.assign(r,{human_evidence_type:val(s.human_evidence_type),human_wishlist_link:val(s.human_wishlist_link),human_primary_intent:val(s.human_primary_intent),human_journey_stage:val(s.human_journey_stage),human_barrier_theme:val(s.human_barrier_theme),human_include_in_quantitative_analysis:val(s.human_include_in_quantitative_analysis),reviewer_notes:val(s.reviewer_notes),human_decision:val(s.human_decision),human_verified:val(s.human_verified),human_label:val(s.human_label),human_review_status:'reviewed',human_verified_at:val(s.human_verified_at),reviewed_at:val(s.human_verified_at)});applied++;
+    });
+    return applied;
+  }
+  function applyAutomatedValidation(rows,validationRows){
+    const byId=new Map(validationRows.map(r=>[val(r.record_id),r]));
+    rows.forEach(r=>{
+      const a=byId.get(val(r.record_id));
+      if(a){['automated_validation_status','validated_evidence_type','validated_wishlist_link','validated_primary_intent','validated_journey_stage','validated_barrier_theme','validated_barriers','validated_outcome_signal','validated_trigger_themes','validated_include_in_quantitative_analysis','evidence_support','validation_rationale','validation_confidence','validation_method','validation_version'].forEach(k=>{r[k]=Array.isArray(a[k])?a[k]:val(a[k]);});}
+      else {r.automated_validation_status='ambiguous_needs_review';r.validated_evidence_type=val(r.evidence_type,'irrelevant_or_unclear');r.validated_wishlist_link=val(r.wishlist_link,'not_mentioned');r.validated_primary_intent=primary(r);r.validated_journey_stage=val(r.journey_stage,'unknown');r.validated_barrier_theme=barrierTheme(r);r.validated_include_in_quantitative_analysis='no';r.evidence_support='No embedded validation record';r.validation_rationale='This record was loaded outside the case-study validation bundle and requires review.';r.validation_confidence='low';r.validation_method='fallback for non-bundled import';r.validation_version='none';}
+    });
+  }
+  function applyAnalysisPrecedence(rows){
+    rows.forEach(r=>{
+      const reviewed=isReviewed(r), pick=(humanKey,validatedKey,fallback)=>reviewed&&val(r[humanKey])?val(r[humanKey]):val(r[validatedKey],fallback);
+      r.analysis_evidence_type=pick('human_evidence_type','validated_evidence_type','irrelevant_or_unclear');
+      r.analysis_wishlist_link=pick('human_wishlist_link','validated_wishlist_link','not_mentioned');
+      r.analysis_primary_intent=pick('human_primary_intent','validated_primary_intent','unknown');
+      r.analysis_journey_stage=pick('human_journey_stage','validated_journey_stage','unknown');
+      r.analysis_barrier_theme=pick('human_barrier_theme','validated_barrier_theme','other/unclear');
+      r.analysis_validated_barriers=reviewed&&val(r.human_barrier_theme)?[val(r.human_barrier_theme)]:validatedBarriers(r);
+      r.analysis_include_in_quantitative_analysis=pick('human_include_in_quantitative_analysis','validated_include_in_quantitative_analysis','no');
+      r.analysis_status=reviewed?'human_reviewed':val(r.automated_validation_status,'ambiguous_needs_review');
+      const comparisons=[['validated_evidence_type','human_evidence_type'],['validated_wishlist_link','human_wishlist_link'],['validated_primary_intent','human_primary_intent'],['validated_journey_stage','human_journey_stage'],['validated_barrier_theme','human_barrier_theme']];
+      r.validation_conflict_with_human=reviewed&&comparisons.some(([a,b])=>val(r[b])&&val(r[a])!==val(r[b]))?'true':'false';
+    });
+  }
+  async function preloadCaseStudy(){
+    if(window.__nykaaBaseStatePromise)try{await window.__nykaaBaseStatePromise;}catch(e){}
+    setDatasetStatus('loading','Loading pilot research…','Using the embedded case-study research bundle; no file upload, fetch, or API call is required.');
+    try{
+      const {pilotRows,classRows,validationRows,adjudicationRows}=bundledRows();
+      const required=['record_id','raw_text','evidence_type','journey_stage','wishlist_link','barrier_theme','human_review_status'];
+      const actual=Object.keys(classRows[0]||{}),missing=required.filter(k=>!actual.includes(k));
+      if(missing.length)throw new Error(`classification output bundle has an unexpected schema. Missing: ${missing.join(', ')}. Actual columns: ${actual.join(', ')||'(none)'}`);
+      const pilotIds=new Set(pilotRows.map(r=>val(r.record_id)).filter(Boolean));
+      const classIds=new Set(classRows.map(r=>val(r.record_id)).filter(Boolean));
+      if(pilotIds.size!==classIds.size||[...classIds].some(id=>!pilotIds.has(id)))throw new Error('The bundled pilot and classification assets do not contain the same record IDs.');
+      const validationIds=new Set(validationRows.map(r=>val(r.record_id)).filter(Boolean));
+      if(validationIds.size!==classIds.size||[...classIds].some(id=>!validationIds.has(id)))throw new Error('The bundled automated validation output does not align one-to-one with classification records.');
+      const loaded=mergePilotProvenance(classRows,pilotRows).map(normalize);applyAutomatedValidation(loaded,validationRows);mergeAdjudication(loaded,adjudicationRows);const stats=humanReviewStats(loaded),validationStats=automatedValidationStats(loaded);
+      results=loaded;V.resultsArea.style.display='block';V.emptyState.style.display='none';
+      q('rackCount').textContent=`${classRows.length} evidence units`;
+      setDatasetStatus('ready','Pilot research loaded',`${classRows.length} evidence units available for review. AI candidates and automated evidence validation loaded locally. Human adjudication loaded without changing source fields. ${validationStats.automatically_validated} automatically validated · ${validationStats.automatically_corrected} automatically corrected · ${validationStats.ambiguous_needs_review} ambiguous · ${stats.reviewed} human reviewed.`,loaded,stats,validationStats);
+      V.pilotStatus.textContent=`Loaded ${classRows.length} existing pilot classifications plus deterministic validation from the embedded bundle; human review state preserved.`;q('statusText').textContent='Pilot research and automated validation loaded locally; no file fetch or API call made.';render();if(typeof saveState==='function')saveState();document.dispatchEvent(new CustomEvent('pilotloaded'));
+    }catch(err){results=[];V.resultsArea.style.display='none';V.emptyState.style.display='block';setDatasetStatus('error','Pilot research bundle unavailable','The reviewer experience could not initialize from the embedded data. '+val(err.message,'unknown preload error'));V.pilotStatus.textContent='Embedded preload failed; use Advanced / import dataset as a recovery path.';q('statusText').textContent='Pilot preload failed; no fallback classifications were generated.';}
+  }
+  function candidate(r){return val(r.analysis_include_in_quantitative_analysis).toLowerCase()==='yes'&&['direct_wishlist_behavior','pre_purchase_hesitation'].includes(evidenceType(r))&&['explicit_direct','explicit_pre_purchase'].includes(wishlistLink(r))&&validatedBarriers(r).length>0&&val(r.analysis_status)!=='ambiguous_needs_review';}
+  function options(sel,values){const old=sel.value;sel.innerHTML='<option value="">All</option>';[...new Set(values.filter(Boolean).sort())].forEach(x=>{const o=document.createElement('option');o.value=x;o.textContent=x;sel.appendChild(o);});sel.value=old;}
+  function filtered(){const f={t:V.filterTier.value,e:V.filterEvidenceType.value,w:V.filterWishlist.value,j:V.filterJourney.value,i:V.filterIntent.value,b:V.filterBarrier.value,s:V.filterSource.value,r:V.filterReview.value};return results.filter(r=>(!f.t||tier(r)===f.t)&&(!f.e||evidenceType(r)===f.e)&&(!f.w||wishlistLink(r)===f.w)&&(!f.j||val(r.analysis_journey_stage||r.validated_journey_stage||r.journey_stage,'unknown')===f.j)&&(!f.i||primary(r)===f.i)&&(!f.b||validatedBarriers(r).includes(f.b))&&(!f.s||val(r.source)===f.s)&&(!f.r||val(r.human_review_status)===f.r));}
+  function patterns(input){const groups={};input.filter(candidate).forEach(r=>validatedBarriers(r).forEach(k=>{(groups[k]||(groups[k]=[])).push(r);}));return Object.entries(groups).map(([theme,rs])=>{const sources=[...new Set(rs.map(r=>val(r.source,'Unknown source')))],ambiguous=rs.some(r=>val(r.analysis_status)==='ambiguous_needs_review'),humanApplied=rs.some(isReviewed);return{theme,records:[...new Map(rs.map(r=>[r.record_id,r])).values()],count:new Set(rs.map(r=>r.record_id)).size,sources,cross:sources.length>1?`Validated signal across ${sources.length} sources`:'Single-source validated signal',status:ambiguous?'HYPOTHESIS — ambiguous records require review':`SUPPORTED PATTERN — automated validation${humanApplied?' with human overrides applied':''}`,hypothesis:`Users may delay purchase when ${theme} appears in wishlist or pre-purchase evidence; test through interviews and further research.`};}).sort((a,b)=>b.count-a.count);}
+  function bars(box,counts,total,fill){box.innerHTML='';Object.entries(counts).sort((a,b)=>b[1]-a[1]).forEach(([k,n])=>{const p=total?Math.round(n/total*1000)/10:0,d=document.createElement('div');d.className='barrow';d.innerHTML=`<div class="toprow"><span class="label">${esc(k)}</span><span class="pct">${p}% (${n})</span></div><div class="track"><div class="fill ${fill}" style="width:${p}%"></div></div>`;box.appendChild(d);});if(!Object.keys(counts).length)box.innerHTML='<p class="footnote">No records in this view.</p>';}
+  function renderFunnel(input,ps){const h=(r,k)=>val(r[k]);const a=[['Research',input.length],['Relevance',input.filter(r=>h(r,'raw_text')&&(h(r,'heuristic_relevance')||h(r,'source_type'))).length],['Evidence Type',input.filter(r=>evidenceType(r)).length],['Journey Stage',input.filter(r=>val(r.analysis_journey_stage||r.validated_journey_stage||r.journey_stage)).length],['Wishlist Linkage',input.filter(r=>wishlistLink(r)).length],['Primary Intent',input.filter(r=>primary(r)!=='unknown').length],['Outcome',input.filter(r=>h(r,'outcome_signal')).length],['Barrier',input.filter(r=>barrierTheme(r)).length],['Trigger',input.filter(r=>h(r,'discovery_trigger')).length],['User Context / Segment',input.filter(r=>h(r,'respondent_id')||h(r,'question_field')||h(r,'user_context')||h(r,'age_range')||h(r,'gender')||h(r,'city')).length],['Evidence Strength',input.filter(r=>h(r,'evidence_strength')||h(r,'confidence')).length],['Automated Validation',input.filter(r=>['automatically_validated','automatically_corrected'].includes(val(r.automated_validation_status))).length],['Cross-source Validation',ps.filter(p=>p.sources.length>1).length],['Pattern',ps.length],['Problem Hypothesis',ps.length]];V.funnel.innerHTML=a.map(x=>`<div class="stage"><span class="n">${x[1]}</span><span class="lbl">${x[0]}</span></div>`).join('');}
+  function inspect(id){const r=results.find(x=>val(x.record_id)===val(id));if(!r)return;V.detailPanel.style.display='block';V.detailStatus.textContent=isReviewed(r)?'HUMAN REVIEWED':val(r.automated_validation_status,'PENDING AUTOMATED VALIDATION').replaceAll('_',' ').toUpperCase();V.detailGrid.innerHTML='';[['Record ID',r.record_id],['Source',r.source],['Source type',r.source_type],['Source file',r.source_file],['Published at',r.published_at],['Respondent / field',`${val(r.respondent_id,'—')} / ${val(r.question_field,'—')}`],['Heuristic relevance',r.heuristic_relevance],['AI candidate evidence type',r.evidence_type],['AI candidate journey stage',r.journey_stage],['AI candidate wishlist linkage',r.wishlist_link],['AI candidate primary intent',r.primary_intent],['AI candidate barrier',val(r.barrier_theme,r.barrier)],['Automated validation status',r.automated_validation_status],['Evidence subtype',r.evidence_subtype],['Theme signal type',r.theme_signal_type],['Validated evidence type',evidenceType(r)],['Validated journey stage',val(r.analysis_journey_stage||r.validated_journey_stage||r.journey_stage)],['Validated wishlist linkage',wishlistLink(r)],['Validated primary intent',primary(r)],['Validated barrier',barrierTheme(r)],['Validated barriers',validatedBarriers(r).join(' | ')],['Validated outcome signal',r.validated_outcome_signal],['Validated trigger themes',listValue(r.validated_trigger_themes).join(' | ')],['Evidence support',r.evidence_support],['Validation rationale',r.validation_rationale],['Validation confidence',r.validation_confidence],['Quantitative inclusion used',r.analysis_include_in_quantitative_analysis],['Outcome',r.outcome_signal],['Secondary theme',r.secondary_theme],['Trigger',r.discovery_trigger],['Underlying need',r.underlying_need],['User context',val(r.user_context,'Not captured')],['Model',r.model],['Prompt version',r.prompt_version],['Classification method',r.classification_method],['Human review status',r.human_review_status],['Human conflict with automated validation',r.validation_conflict_with_human],['Human label',val(r.human_label,'Not provided')],['Original quantitative inclusion',r.include_in_quantitative_analysis],['Exclusion reason',r.exclusion_reason]].forEach(([k,x])=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=k;dd.textContent=val(x,'—');V.detailGrid.append(dt,dd);});V.detailRaw.textContent=val(r.raw_text,'No raw evidence text captured.');V.detailPanel.scrollIntoView({behavior:'smooth',block:'start'});}
+  function renderPatterns(ps){if(!ps.length){V.patternTable.innerHTML='<p class="footnote">No wishlist-linked direct/pre-purchase candidate patterns in this view.</p>';return;}V.patternTable.innerHTML=`<div style="overflow:auto"><table class="pattern-table"><thead><tr><th>Candidate theme</th><th>Records</th><th>Sources</th><th>Cross-source lens</th><th>Status</th><th>Problem hypothesis</th><th>Trace</th></tr></thead><tbody>${ps.map(p=>`<tr><td>${esc(p.theme)}</td><td>${p.count}</td><td>${esc(p.sources.join(', '))}</td><td>${esc(p.cross)}</td><td><span class="status-badge">${esc(p.status)}</span></td><td>${esc(p.hypothesis)}</td><td>${p.records.slice(0,8).map(r=>`<button class="trace-btn" data-record-id="${esc(r.record_id)}">${esc(r.record_id)}</button>`).join('')}${p.records.length>8?`<span class="small-label">+${p.records.length-8} more</span>`:''}</td></tr>`).join('')}</tbody></table></div>`;V.patternTable.querySelectorAll('[data-record-id]').forEach(b=>b.onclick=()=>inspect(b.dataset.recordId));}
+  function render(){applyAnalysisPrecedence(results);options(V.filterTier,results.map(r=>tier(r)));options(V.filterEvidenceType,results.map(r=>evidenceType(r)));options(V.filterWishlist,results.map(r=>wishlistLink(r)));options(V.filterJourney,results.map(r=>val(r.analysis_journey_stage||r.validated_journey_stage||r.journey_stage)));options(V.filterIntent,results.map(r=>primary(r)));options(V.filterBarrier,results.flatMap(r=>validatedBarriers(r)));options(V.filterSource,results.map(r=>r.source));options(V.filterReview,results.map(r=>r.human_review_status));const input=filtered(),ps=patterns(input);V.filteredCount.textContent=input.length+' visible';V.evidenceStatus.textContent=results.length?'OBSERVED / SUPPORTED PATTERN / HYPOTHESIS · AUTOMATED VALIDATION ACTIVE':'UNKNOWN';renderFunnel(input,ps);const classified=input.filter(r=>val(r.analysis_status)!=='ambiguous_needs_review'&&val(r.analysis_status)!=='failed'&&val(r.analysis_status)!=='pending'),unclear=input.filter(r=>evidenceType(r)==='irrelevant_or_unclear'||val(r.analysis_status)==='ambiguous_needs_review'),failed=input.filter(r=>r.status==='failed'),bc={},ic={},cc={};classified.forEach(r=>{const bs=validatedBarriers(r);(bs.length?bs:['other/unclear']).forEach(b=>{bc[b]=(bc[b]||0)+1;});const i=primary(r);ic[i]=(ic[i]||0)+1;const c=val(r.category,'Other or Unclear');cc[c]=(cc[c]||0)+1;});const barrierTotal=Object.values(bc).reduce((sum,n)=>sum+n,0);bars(V.barrierBars,bc,barrierTotal,'thread');V.barrierFoot.textContent=`Validated barrier-mention distribution among ${barrierTotal} mentions from ${classified.length} loaded records in this view; ${unclear.length} unclear/ambiguous and ${failed.length} failed. Human review remains separately recorded.`;bars(V.intentBars,ic,classified.length,'gold');bars(V.categoryBars,cc,classified.length,'green');V.tagCount.textContent=input.length;V.tagRack.innerHTML='';input.forEach(r=>{const d=document.createElement('div');d.dataset.recordId=r.record_id;d.className='tag barrier-'+({ 'value/price assessment':'price','fit/size confidence':'fit','quality/material confidence':'fit','trust/authenticity':'trust','occasion/styling':'styling','comparison/alternative':'compare','deprioritization/memory':'forgot','wishlist/UX discoverability':'bookmark'})[barrierTheme(r)]||'unclear';d.tabIndex=0;d.onclick=()=>inspect(r.record_id);d.onkeydown=e=>{if(e.key==='Enter')inspect(r.record_id);};d.innerHTML=`<span class="src-badge">${esc(r.source)}</span><h3>${esc(validatedBarriers(r).join(' · ')||'other/unclear')}</h3><dl><dt>Evidence type</dt><dd>${esc(evidenceType(r))}</dd><dt>Wishlist linkage</dt><dd>${esc(wishlistLink(r))}</dd><dt>Primary intent</dt><dd>${esc(primary(r))}</dd><dt>Validation</dt><dd><span class="status-badge">${esc(val(r.analysis_status,'UNKNOWN').replaceAll('_',' ').toUpperCase())}</span></dd><dt>Outcome</dt><dd>${esc(r.validated_outcome_signal||r.outcome_signal||'—')}</dd><dt>Strength</dt><dd>${esc(val(r.evidence_strength,r.confidence,'—'))}</dd><dt>Human audit</dt><dd>${esc(isReviewed(r)?'REVIEWED':'PENDING HUMAN REVIEW')}</dd></dl><p class="quote">${esc(r.evidence_note||r.raw_text||'')}</p>`;V.tagRack.appendChild(d);});renderPatterns(ps);}
+  V.loadPilotBtn.onclick=()=>{
+    const f=V.pilotFile.files[0];
+    if(!f){V.pilotStatus.textContent='Choose classification_output.csv first.';return;}
+    V.pilotStatus.textContent='Reading pilot CSV locally…';
+    q('statusText').textContent='';
+    const rd=new FileReader();
+    rd.onerror=()=>{V.pilotStatus.textContent='Could not read the selected file. Check that it is a readable local CSV.';};
+    rd.onabort=()=>{V.pilotStatus.textContent='Pilot CSV reading was cancelled.';};
+    rd.onload=e=>{
+      try{
+        const rows=csv(e.target.result);
+        if(!rows.length) throw new Error('The CSV contains no data rows after parsing.');
+        const req=['record_id','raw_text','evidence_type','journey_stage','wishlist_link','barrier_theme','human_review_status'];
+        const actual=Object.keys(rows[0]||{});
+        const missing=req.filter(k=>!actual.includes(k));
+        if(missing.length) throw new Error(`Unexpected pilot schema. Missing: ${missing.join(', ')}. Actual columns: ${actual.join(', ')||'(none)'}`);
+        const loaded=rows.map(normalize);
+        if(!loaded.length) throw new Error('The pilot CSV parsed successfully but produced zero records.');
+        results=loaded;V.resultsArea.style.display='block';V.emptyState.style.display='none';V.pilotStatus.textContent=`Loaded ${results.length} provenance-aware pilot records locally; human review status preserved.`;q('statusText').textContent='Pilot loaded locally; no API call made.';render();if(typeof saveState==='function')saveState();document.dispatchEvent(new CustomEvent('pilotloaded'));
+      }catch(err){V.pilotStatus.textContent='Pilot load failed: '+val(err.message,'unknown CSV error');}
+    };
+    rd.readAsText(f);
+  };
+  q('analyzeBtn').onclick=async()=>{const key=val(V.apiKey.value);if(!key){q('statusText').textContent='No API key: load the pilot CSV or configure a secure local backend.';return;}q('analyzeBtn').disabled=true;V.resultsArea.style.display='block';V.emptyState.style.display='none';results=snippets.map(s=>normalize({...s,record_id:s.id,raw_text:s.text,source_type:'secondary_research',human_review_status:'pending',status:'pending'}));render();for(let i=0;i<snippets.length;i++){q('statusText').innerHTML='<span class="spin"></span>Classifying '+(i+1)+' of '+snippets.length+'…';try{const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1400,system:V2_PROMPT,messages:[{role:'user',content:`Source: ${snippets[i].source}\nSnippet: """${snippets[i].text}"""`} ]})});if(!resp.ok)throw new Error('API HTTP '+resp.status);const data=await resp.json(),tb=(data.content||[]).find(c=>c.type==='text');if(!tb)throw new Error('No text block');const p=JSON.parse(tb.text.trim().replace(/^```json/,'').replace(/^```/,'').replace(/```$/,'').trim());results[i]=normalize({...snippets[i],...p,record_id:snippets[i].id,source_type:'secondary_research',human_review_status:'pending',model:'claude-sonnet-4-6',prompt_version:PROMPT_VERSION,classification_method:'LLM candidate classification; human review pending',status:'done'});}catch(err){results[i]=normalize({...snippets[i],record_id:snippets[i].id,raw_text:snippets[i].text,source_type:'secondary_research',human_review_status:'pending',status:'failed',error:val(err.message,'classification failed')});}render();if(typeof saveState==='function')saveState();}q('statusText').textContent='Done; candidate labels remain pending human review.';q('analyzeBtn').disabled=false;};
+  [V.filterTier,V.filterEvidenceType,V.filterWishlist,V.filterJourney,V.filterIntent,V.filterBarrier,V.filterSource,V.filterReview].forEach(s=>s.addEventListener('change',render));V.clearFilters.onclick=()=>{[V.filterTier,V.filterEvidenceType,V.filterWishlist,V.filterJourney,V.filterIntent,V.filterBarrier,V.filterSource,V.filterReview].forEach(s=>s.value='');render();};
+  window.NykaaDiscoveryEngine={parseCSV:window.NykaaDiscoveryEngine?window.NykaaDiscoveryEngine.parseCSV:csv,normalizeLoadedRow:normalize,evidenceTier:tier,buildPatternRows:patterns,filterResults:filtered,render:render};
+  if(results.length){V.resultsArea.style.display='block';V.emptyState.style.display='none';render();}
+  preloadCaseStudy();
+})();
+</script>
+<script>
+(function(){
+  // Human decisions are stored separately from deterministic/LLM candidate fields.
+  const A={
+    panel:document.getElementById('adjudicationPanel'),summaryPanel:document.getElementById('reviewSummaryPanel'),target:document.getElementById('reviewTarget'),
+    evidence:document.getElementById('humanEvidenceType'),wishlist:document.getElementById('humanWishlistLink'),intent:document.getElementById('humanPrimaryIntent'),
+    journey:document.getElementById('humanJourneyStage'),barrier:document.getElementById('humanBarrier'),include:document.getElementById('humanInclude'),notes:document.getElementById('reviewerNotes'),
+    reviewed:document.getElementById('reviewedCount'),pending:document.getElementById('pendingCount'),included:document.getElementById('includedCount'),excluded:document.getElementById('excludedCount'),
+    status:document.getElementById('reviewStatus'),summary:document.getElementById('reviewSummary'),
+    adjudicationFile:document.getElementById('adjudicationFile'),adjudicationStatus:document.getElementById('adjudicationStatus')
+  };
+  const ADJ_STORAGE_KEY='nykaa-wishlist-human-adjudication-v1';
+  let currentId='';
+  const v=x=>x===null||x===undefined?'':String(x).trim();
+  const candidateIntent=r=>v(r.primary_intent)||({ 'Genuine Purchase Intent':'genuine_purchase_intent','Bookmark or Inspiration Only':'bookmark_or_inspiration'})[v(r.intent_signal)]|| (v(r.outcome_signal)==='considering_or_waiting'?'considering_or_waiting':'unknown');
+  const candidateValues=r=>({evidence_type:v(r.evidence_type,'irrelevant_or_unclear'),wishlist_link:v(r.wishlist_link,'not_mentioned'),primary_intent:candidateIntent(r),journey_stage:v(r.journey_stage,'unknown'),barrier_theme:v(r.barrier_theme||r.barrier,'other/unclear')});
+  const readLabel=r=>{try{const x=JSON.parse(v(r.human_label));return x&&typeof x==='object'?x:null;}catch(e){return null;}};
+  const humanValues=r=>{const x=readLabel(r)||{};return{evidence_type:v(r.human_evidence_type||x.evidence_type,candidateValues(r).evidence_type),wishlist_link:v(r.human_wishlist_link||x.wishlist_link,candidateValues(r).wishlist_link),primary_intent:v(r.human_primary_intent||x.primary_intent,candidateValues(r).primary_intent),journey_stage:v(r.human_journey_stage||x.journey_stage,candidateValues(r).journey_stage),barrier_theme:v(r.human_barrier_theme||x.barrier_theme,candidateValues(r).barrier_theme),include:v(r.human_include_in_quantitative_analysis||x.include_in_quantitative_analysis),notes:v(r.reviewer_notes||x.reviewer_notes)};};
+  const reviewed=r=>v(r.human_review_status)==='reviewed';
+  const setValue=(el,x)=>{const val=x||'';el.value=[...el.options].some(o=>o.value===val)?val:el.options[0].value;};
+  function reviewRows(){return window.NykaaDiscoveryEngine&&window.NykaaDiscoveryEngine.filterResults?window.NykaaDiscoveryEngine.filterResults():results;}
+  function persist(){try{localStorage.setItem(ADJ_STORAGE_KEY,JSON.stringify(results.filter(reviewed).map(r=>({record_id:r.record_id,source:r.source,source_type:r.source_type,source_file:r.source_file,respondent_id:r.respondent_id,question_field:r.question_field,raw_text:r.raw_text,evidence_type:r.evidence_type,wishlist_link:r.wishlist_link,primary_intent:candidateIntent(r),journey_stage:r.journey_stage,barrier_theme:r.barrier_theme,human_evidence_type:r.human_evidence_type,human_wishlist_link:r.human_wishlist_link,human_primary_intent:r.human_primary_intent,human_journey_stage:r.human_journey_stage,human_barrier_theme:r.human_barrier_theme,human_include_in_quantitative_analysis:r.human_include_in_quantitative_analysis,reviewer_notes:r.reviewer_notes,human_review_status:r.human_review_status,human_label:r.human_label,reviewed_at:r.reviewed_at}))));}catch(e){}}
+  function applySaved(){try{const saved=JSON.parse(localStorage.getItem(ADJ_STORAGE_KEY)||'[]');if(!Array.isArray(saved))return;const byId=new Map(saved.map(x=>[v(x.record_id),x]));results.forEach(r=>{const s=byId.get(v(r.record_id));if(!s||v(s.human_review_status)!=='reviewed')return;Object.assign(r,{human_evidence_type:v(s.human_evidence_type),human_wishlist_link:v(s.human_wishlist_link),human_primary_intent:v(s.human_primary_intent),human_journey_stage:v(s.human_journey_stage),human_barrier_theme:v(s.human_barrier_theme),human_include_in_quantitative_analysis:v(s.human_include_in_quantitative_analysis),reviewer_notes:v(s.reviewer_notes),human_review_status:'reviewed',human_label:v(s.human_label),reviewed_at:v(s.reviewed_at)});});}catch(e){}}
+  function updateCounters(){const done=results.filter(reviewed);A.reviewed.textContent=done.length;A.pending.textContent=Math.max(0,results.length-done.length);A.included.textContent=done.filter(r=>v(r.human_include_in_quantitative_analysis)==='yes').length;A.excluded.textContent=done.filter(r=>v(r.human_include_in_quantitative_analysis)==='no').length;}
+  function updateSummary(){const done=results.filter(reviewed),fields=[['evidence_type','human_evidence_type'],['wishlist_link','human_wishlist_link'],['primary_intent','human_primary_intent'],['journey_stage','human_journey_stage'],['barrier_theme','human_barrier_theme']];let changed=0,agree=0;const corrections={};done.forEach(r=>{const c=candidateValues(r);const h=humanValues(r);const same=fields.every(([a,b])=>v(c[a])===v(h[b]));if(same)agree++;if(!same)changed++;if(v(c.barrier_theme)!==v(h.barrier_theme)){const key=`${v(c.barrier_theme,'(blank)')} → ${v(h.barrier_theme,'(blank)')}`;corrections[key]=(corrections[key]||0)+1;}});const corr=Object.entries(corrections).sort((a,b)=>b[1]-a[1]).map(([x,n])=>`  • ${x}: ${n}`).join('\n')||'  None recorded';A.summary.textContent=`Records reviewed: ${done.length}\nClassification changes: ${changed}\nInclusion decisions: ${done.filter(r=>['yes','no'].includes(v(r.human_include_in_quantitative_analysis))).length} (include ${done.filter(r=>v(r.human_include_in_quantitative_analysis)==='yes').length}; exclude ${done.filter(r=>v(r.human_include_in_quantitative_analysis)==='no').length})\nAgreement with deterministic pre-label: ${done.length?`${agree}/${done.length} records (${Math.round(agree/done.length*1000)/10}%)`:'not available — no human labels saved'}\nAccuracy: not calculated\nMajor taxonomy corrections:\n${corr}`;}
+  function refresh(){if(window.NykaaDiscoveryEngine&&window.NykaaDiscoveryEngine.render)window.NykaaDiscoveryEngine.render();updateCounters();updateSummary();}
+  function openReview(id){const r=results.find(x=>v(x.record_id)===v(id));if(!r)return;currentId=r.record_id;const c=candidateValues(r),h=humanValues(r);A.panel.style.display='block';A.summaryPanel.style.display='block';A.target.textContent=r.record_id;setValue(A.evidence,h.evidence_type);setValue(A.wishlist,h.wishlist_link);setValue(A.intent,h.primary_intent);setValue(A.journey,h.journey_stage);setValue(A.barrier,h.barrier_theme);setValue(A.include,h.include);A.notes.value=h.notes;A.status.textContent=reviewed(r)?'Saved human review loaded.':'Pending — review and save.';}
+  function currentOrFirst(){const rows=reviewRows();if(!rows.length)return null;return rows.find(r=>v(r.record_id)===v(currentId))||rows[0];}
+  function candidateConfirm(){const r=results.find(x=>v(x.record_id)===v(currentId))||currentOrFirst();if(!r){A.status.textContent='Load the pilot output before reviewing a record.';return;}const c=candidateValues(r);setValue(A.evidence,c.evidence_type);setValue(A.wishlist,c.wishlist_link);setValue(A.intent,c.primary_intent);setValue(A.journey,c.journey_stage);setValue(A.barrier,c.barrier_theme);A.status.textContent='Candidate labels copied into the form; click Save human review to record the human decision.';}
+  function saveReview(){const r=results.find(x=>v(x.record_id)===v(currentId))||currentOrFirst();if(!r){A.status.textContent='Load the pilot output before saving a review.';return;}currentId=r.record_id;const label={evidence_type:A.evidence.value,wishlist_link:A.wishlist.value,primary_intent:A.intent.value,journey_stage:A.journey.value,barrier_theme:A.barrier.value,include_in_quantitative_analysis:A.include.value,reviewer_notes:A.notes.value};r.human_evidence_type=label.evidence_type;r.human_wishlist_link=label.wishlist_link;r.human_primary_intent=label.primary_intent;r.human_journey_stage=label.journey_stage;r.human_barrier_theme=label.barrier_theme;r.human_include_in_quantitative_analysis=label.include;r.reviewer_notes=label.reviewer_notes;r.human_label=JSON.stringify(label);r.human_review_status='reviewed';r.reviewed_at=new Date().toISOString();persist();if(typeof saveState==='function')saveState();refresh();openReview(currentId);A.status.textContent='Human review saved locally; candidate labels remain unchanged.';}
+  function move(delta){const rows=reviewRows();if(!rows.length){A.status.textContent='No records match the current filters.';return;}let i=rows.findIndex(r=>v(r.record_id)===v(currentId));if(i<0)i=delta>0?-1:rows.length;openReview(rows[(i+delta+rows.length)%rows.length].record_id);}
+  function togglePending(){const f=document.getElementById('filterReview'),b=document.getElementById('pendingOnly');if(f.value==='pending'){f.value='';b.textContent='Show only pending';}else{f.value='pending';b.textContent='Show all review records';}refresh();const rows=reviewRows();if(rows.length)openReview(rows[0].record_id);}
+  function cell(x){return `"${v(x).replace(/"/g,'""')}"`;}
+  function adjudicationCSV(){const headers=['record_id','source','source_type','source_file','respondent_id','question_field','raw_text','candidate_evidence_type','candidate_wishlist_link','candidate_primary_intent','candidate_journey_stage','candidate_barrier_theme','human_evidence_type','human_wishlist_link','human_primary_intent','human_journey_stage','human_barrier_theme','human_include_in_quantitative_analysis','reviewer_notes','human_review_status','human_label','reviewed_at'];const lines=[headers.join(',')];results.forEach(r=>{const c=candidateValues(r);const h=humanValues(r);lines.push([r.record_id,r.source,r.source_type,r.source_file,r.respondent_id,r.question_field,r.raw_text,c.evidence_type,c.wishlist_link,c.primary_intent,c.journey_stage,c.barrier_theme,h.evidence_type,h.wishlist_link,h.primary_intent,h.journey_stage,h.barrier_theme,h.include,h.notes,r.human_review_status,r.human_label,r.reviewed_at].map(cell).join(','));});return lines.join('\n');}
+  function download(){const blob=new Blob([adjudicationCSV()],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='human_adjudication.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);A.adjudicationStatus.textContent='Downloaded human_adjudication.csv; pilot output was not overwritten.';}
+  function loadAdjudication(){const f=A.adjudicationFile.files[0];if(!f){A.adjudicationStatus.textContent='Choose a human_adjudication.csv file first.';return;}if(!results.length){A.adjudicationStatus.textContent='Load the pilot output before loading adjudication decisions.';return;}const rd=new FileReader();rd.onerror=()=>A.adjudicationStatus.textContent='Could not read the adjudication file.';rd.onload=e=>{try{const rows=window.NykaaDiscoveryEngine.parseCSV(e.target.result),required=['record_id','human_review_status'],actual=Object.keys(rows[0]||{}),missing=required.filter(k=>!actual.includes(k));if(missing.length)throw new Error(`Missing ${missing.join(', ')}. Actual columns: ${actual.join(', ')||'(none)'}`);let applied=0,unknown=0;rows.forEach(s=>{if(v(s.human_review_status)!=='reviewed')return;const r=results.find(x=>v(x.record_id)===v(s.record_id));if(!r){unknown++;return;}let label={};try{label=JSON.parse(v(s.human_label)||'{}');}catch(e){}r.human_evidence_type=v(s.human_evidence_type||label.evidence_type);r.human_wishlist_link=v(s.human_wishlist_link||label.wishlist_link);r.human_primary_intent=v(s.human_primary_intent||label.primary_intent);r.human_journey_stage=v(s.human_journey_stage||label.journey_stage);r.human_barrier_theme=v(s.human_barrier_theme||label.barrier_theme);r.human_include_in_quantitative_analysis=v(s.human_include_in_quantitative_analysis||label.include_in_quantitative_analysis);r.reviewer_notes=v(s.reviewer_notes||label.reviewer_notes);r.human_label=v(s.human_label)||JSON.stringify({...label,reviewer_notes:r.reviewer_notes});r.human_review_status='reviewed';r.reviewed_at=v(s.reviewed_at);applied++;});persist();if(typeof saveState==='function')saveState();refresh();A.adjudicationStatus.textContent=`Loaded ${applied} human decisions; ${unknown} record IDs were not found. Candidate labels remain preserved.`;}catch(err){A.adjudicationStatus.textContent='Adjudication load failed: '+v(err.message,'unexpected CSV error');}};rd.readAsText(f);}
+  document.getElementById('confirmClassification').onclick=candidateConfirm;document.getElementById('saveHumanReview').onclick=saveReview;document.getElementById('previousReview').onclick=()=>move(-1);document.getElementById('nextReview').onclick=()=>move(1);document.getElementById('reviewCurrent').onclick=()=>{const r=currentOrFirst();if(r)openReview(r.record_id);else A.status.textContent='Load the pilot output before reviewing a record.';};document.getElementById('pendingOnly').onclick=togglePending;document.getElementById('downloadAdjudication').onclick=download;document.getElementById('loadAdjudication').onclick=loadAdjudication;
+  document.getElementById('tagRack').addEventListener('click',e=>{const card=e.target.closest('.tag');if(card&&card.dataset.recordId)openReview(card.dataset.recordId);});document.getElementById('patternTable').addEventListener('click',e=>{const b=e.target.closest('[data-record-id]');if(b)openReview(b.dataset.recordId);});
+  document.addEventListener('pilotloaded',()=>{applySaved();A.panel.style.display='block';A.summaryPanel.style.display='block';refresh();const r=reviewRows()[0];if(r)openReview(r.record_id);});
+  if(results.length){applySaved();A.panel.style.display='block';A.summaryPanel.style.display='block';refresh();if(!currentId&&results[0])openReview(results[0].record_id);}
+  updateCounters();updateSummary();
+  window.NykaaDiscoveryAdjudication={openReview,saveReview,adjudicationCSV,loadAdjudication,updateSummary};
+})();
+</script>
+<script>
+(function(){
+  // Final review UX layer. It deliberately overrides only review actions; the existing
+  // funnel, filters, provenance, candidate labels and pattern engine remain in place.
+  const E={
+    panel:document.getElementById('adjudicationPanel'),summaryPanel:document.getElementById('reviewSummaryPanel'),target:document.getElementById('reviewTarget'),raw:document.getElementById('reviewRawEvidence'),context:document.getElementById('reviewContext'),ai:document.getElementById('aiInterpretationText'),editPanel:document.getElementById('editClassificationPanel'),
+    evidence:document.getElementById('humanEvidenceType'),wishlist:document.getElementById('humanWishlistLink'),intent:document.getElementById('humanPrimaryIntent'),journey:document.getElementById('humanJourneyStage'),barrier:document.getElementById('humanBarrier'),include:document.getElementById('humanInclude'),notes:document.getElementById('reviewerNotes'),
+    reviewed:document.getElementById('reviewedCount'),pending:document.getElementById('pendingCount'),confirmed:document.getElementById('confirmedCount'),corrected:document.getElementById('correctedCount'),included:document.getElementById('includedCount'),excluded:document.getElementById('excludedCount'),status:document.getElementById('reviewStatus'),summary:document.getElementById('reviewSummary'),file:document.getElementById('adjudicationFile'),fileStatus:document.getElementById('adjudicationStatus')
+  };
+  const KEY='nykaa-wishlist-human-adjudication-v1'; let currentId='';
+  function hideUnreconciledMetrics(){E.summary.textContent=E.summary.textContent.split('\n').filter(line=>!/^Included:|^Excluded:|^Agreement with deterministic pre-label:/.test(line)).join('\n');}
+  const v=x=>x===null||x===undefined?'':String(x).trim();
+  const candidateIntent=r=>v(r.primary_intent)||({'Genuine Purchase Intent':'genuine_purchase_intent','Bookmark or Inspiration Only':'bookmark_or_inspiration'})[v(r.intent_signal)]||(v(r.outcome_signal)==='considering_or_waiting'?'considering_or_waiting':'unknown');
+  const candidate=r=>({evidence_type:v(r.evidence_type,'irrelevant_or_unclear'),wishlist_link:v(r.wishlist_link,'not_mentioned'),primary_intent:candidateIntent(r),journey_stage:v(r.journey_stage,'unknown'),barrier_theme:v(r.barrier_theme||r.barrier,'other/unclear')});
+  const human=r=>{let x={};try{x=JSON.parse(v(r.human_label)||'{}');}catch(e){}return{evidence_type:v(r.human_evidence_type||x.evidence_type),wishlist_link:v(r.human_wishlist_link||x.wishlist_link),primary_intent:v(r.human_primary_intent||x.primary_intent),journey_stage:v(r.human_journey_stage||x.journey_stage),barrier_theme:v(r.human_barrier_theme||x.barrier_theme),include:v(r.human_include_in_quantitative_analysis||x.include_in_quantitative_analysis),notes:v(r.reviewer_notes||x.reviewer_notes),decision:v(r.human_decision||x.human_decision),verified:v(r.human_verified===true||v(r.human_verified)==='true'||x.human_verified===true),timestamp:v(r.human_verified_at||r.reviewed_at||x.human_verified_at||x.timestamp)};};
+  const reviewed=r=>v(r.human_review_status)==='reviewed';
+  const set=(el,x)=>{const z=v(x);el.value=[...el.options].some(o=>o.value===z)?z:el.options[0].value;};
+  const rows=()=>window.NykaaDiscoveryEngine&&window.NykaaDiscoveryEngine.filterResults?window.NykaaDiscoveryEngine.filterResults():results;
+  function localSave(){try{localStorage.setItem(KEY,JSON.stringify(results.filter(reviewed).map(r=>({record_id:r.record_id,source:r.source,source_type:r.source_type,source_file:r.source_file,respondent_id:r.respondent_id,question_field:r.question_field,raw_text:r.raw_text,human_evidence_type:r.human_evidence_type,human_wishlist_link:r.human_wishlist_link,human_primary_intent:r.human_primary_intent,human_journey_stage:r.human_journey_stage,human_barrier_theme:r.human_barrier_theme,human_include_in_quantitative_analysis:r.human_include_in_quantitative_analysis,reviewer_notes:r.reviewer_notes,human_review_status:r.human_review_status,human_decision:r.human_decision,human_verified:r.human_verified,human_label:r.human_label,human_verified_at:r.human_verified_at}))));return true;}catch(e){return false;}}
+  function applyLocal(){try{const saved=JSON.parse(localStorage.getItem(KEY)||'[]');if(!Array.isArray(saved))return;const byId=new Map(saved.map(x=>[v(x.record_id),x]));results.forEach(r=>{const x=byId.get(v(r.record_id));if(!x||v(x.human_review_status)!=='reviewed')return;Object.assign(r,{human_evidence_type:v(x.human_evidence_type),human_wishlist_link:v(x.human_wishlist_link),human_primary_intent:v(x.human_primary_intent),human_journey_stage:v(x.human_journey_stage),human_barrier_theme:v(x.human_barrier_theme),human_include_in_quantitative_analysis:v(x.human_include_in_quantitative_analysis),reviewer_notes:v(x.reviewer_notes),human_review_status:'reviewed',human_decision:v(x.human_decision)||'confirmed',human_verified:true,human_label:v(x.human_label),human_verified_at:v(x.human_verified_at)});});}catch(e){}}
+  function updateCounters(){const done=results.filter(reviewed);E.reviewed.textContent=done.length;E.pending.textContent=Math.max(0,results.length-done.length);E.confirmed.textContent=done.filter(r=>v(r.human_decision)==='confirmed').length;E.corrected.textContent=done.filter(r=>v(r.human_decision)==='corrected').length;E.included.textContent=done.filter(r=>v(r.human_include_in_quantitative_analysis)==='yes').length;E.excluded.textContent=done.filter(r=>v(r.human_include_in_quantitative_analysis)==='no').length;}
+  function updateSummary(){const done=results.filter(reviewed),fields=[['evidence_type','human_evidence_type'],['wishlist_link','human_wishlist_link'],['primary_intent','human_primary_intent'],['journey_stage','human_journey_stage'],['barrier_theme','human_barrier_theme']];let agree=0,changed=0;const corrections={};done.forEach(r=>{const c=candidate(r),h=human(r),same=fields.every(([a,b])=>v(c[a])===v(h[b]));if(same)agree++;if(!same)changed++;if(v(c.barrier_theme)!==v(h.barrier_theme)){const k=`${v(c.barrier_theme,'(blank)')} → ${v(h.barrier_theme,'(blank)')}`;corrections[k]=(corrections[k]||0)+1;}});const corr=Object.entries(corrections).sort((a,b)=>b[1]-a[1]).map(([k,n])=>`  • ${k}: ${n}`).join('\n')||'  None recorded';E.summary.textContent=`Reviewed: ${done.length}\nPending: ${Math.max(0,results.length-done.length)}\nConfirmed: ${done.filter(r=>v(r.human_decision)==='confirmed').length}\nCorrected: ${done.filter(r=>v(r.human_decision)==='corrected').length}\nIncluded: ${done.filter(r=>v(r.human_include_in_quantitative_analysis)==='yes').length}\nExcluded: ${done.filter(r=>v(r.human_include_in_quantitative_analysis)==='no').length}\nClassification changes: ${changed}\n${done.length?'Agreement with deterministic pre-label: '+agree+'/'+done.length+' records ('+Math.round(agree/done.length*1000)/10+'%)':'AI-human agreement: not shown until a human review is saved'}\nAccuracy: not calculated\nMajor taxonomy corrections:\n${corr}`;}
+  function refresh(){if(window.NykaaDiscoveryEngine&&window.NykaaDiscoveryEngine.render)window.NykaaDiscoveryEngine.render();updateCounters();updateSummary();hideUnreconciledMetrics();}
+  function show(id){const r=results.find(x=>v(x.record_id)===v(id));if(!r)return;currentId=r.record_id;const c=candidate(r),h=human(r);E.panel.style.display='block';E.summaryPanel.style.display='block';E.target.textContent=r.record_id;E.raw.textContent=v(r.raw_text,'No raw evidence captured.');E.context.innerHTML='<strong>Question / context</strong>';const contextText=document.createElement('span');contextText.textContent=v(r.question_field,'Research field not captured')+' · '+v(r.source_type||r.source,'Source not captured')+(v(r.respondent_id)?' · respondent '+v(r.respondent_id):'');E.context.appendChild(contextText);E.ai.textContent=`${c.evidence_type} · ${c.wishlist_link} · ${c.primary_intent} · ${c.journey_stage} · ${c.barrier_theme}`;set(E.evidence,h.evidence_type||c.evidence_type);set(E.wishlist,h.wishlist_link||c.wishlist_link);set(E.intent,h.primary_intent||c.primary_intent);set(E.journey,h.journey_stage||c.journey_stage);set(E.barrier,h.barrier_theme||c.barrier_theme);set(E.include,h.include);E.notes.value=h.notes;E.editPanel.style.display=h.decision==='corrected'?'block':'none';E.target.textContent=reviewed(r)?(h.decision==='corrected'?'✓ HUMAN VERIFIED — CORRECTED':'✓ HUMAN VERIFIED'):(r.record_id);E.status.textContent=reviewed(r)?'Saved human review loaded.':'Pending human review.';}
+  function current(){return results.find(x=>v(x.record_id)===v(currentId))||rows()[0]||null;}
+  function confirm(){const r=current();if(!r){E.status.textContent='Load research before reviewing a record.';return;}const c=candidate(r);set(E.evidence,c.evidence_type);set(E.wishlist,c.wishlist_link);set(E.intent,c.primary_intent);set(E.journey,c.journey_stage);set(E.barrier,c.barrier_theme);commit('confirmed',c);}
+  function edit(){if(!current()){E.status.textContent='Load research before editing a record.';return;}E.editPanel.style.display='block';E.status.textContent='Edit the fields that are not supported by the evidence, then save the correction.';}
+  function commit(decision,values){const r=current();if(!r)return;const label={evidence_type:v(values.evidence_type||E.evidence.value),wishlist_link:v(values.wishlist_link||E.wishlist.value),primary_intent:v(values.primary_intent||E.intent.value),journey_stage:v(values.journey_stage||E.journey.value),barrier_theme:v(values.barrier_theme||E.barrier.value),include_in_quantitative_analysis:E.include.value,reviewer_notes:E.notes.value,human_decision:decision,human_verified:true};r.human_evidence_type=label.evidence_type;r.human_wishlist_link=label.wishlist_link;r.human_primary_intent=label.primary_intent;r.human_journey_stage=label.journey_stage;r.human_barrier_theme=label.barrier_theme;r.human_include_in_quantitative_analysis=label.include_in_quantitative_analysis;r.reviewer_notes=label.reviewer_notes;r.human_decision=decision;r.human_verified=true;r.human_label=JSON.stringify(label);r.human_review_status='reviewed';r.human_verified_at=new Date().toISOString();r.reviewed_at=r.human_verified_at;localSave();if(typeof saveState==='function')saveState();refresh();show(r.record_id);E.status.textContent=decision==='confirmed'?'✓ Human verified — confirmed.':'✓ Human verified — corrected.';}
+  function move(delta){const list=rows();if(!list.length){E.status.textContent='No records match the current filters.';return;}let i=list.findIndex(r=>v(r.record_id)===v(currentId));if(i<0)i=delta>0?-1:list.length;show(list[(i+delta+list.length)%list.length].record_id);}
+  function togglePending(){const f=document.getElementById('filterReview'),b=document.getElementById('pendingOnly');if(f.value==='pending'){f.value='';b.textContent='Show only pending';}else{f.value='pending';b.textContent='Show all review records';}refresh();const list=rows();if(list.length)show(list[0].record_id);}
+  function cell(x){return `"${v(x).replace(/"/g,'""')}"`;}
+  function exportCSV(){const headers=['record_id','source','source_type','source_file','respondent_id','question_field','raw_text','candidate_evidence_type','candidate_wishlist_link','candidate_primary_intent','candidate_journey_stage','candidate_barrier_theme','human_evidence_type','human_wishlist_link','human_primary_intent','human_journey_stage','human_barrier_theme','human_include_in_quantitative_analysis','reviewer_notes','human_review_status','human_decision','human_verified','human_label','human_verified_at'];const lines=[headers.join(',')];results.forEach(r=>{const c=candidate(r),h=reviewed(r)?human(r):{evidence_type:'',wishlist_link:'',primary_intent:'',journey_stage:'',barrier_theme:'',include:'',notes:''};lines.push([r.record_id,r.source,r.source_type,r.source_file,r.respondent_id,r.question_field,r.raw_text,c.evidence_type,c.wishlist_link,c.primary_intent,c.journey_stage,c.barrier_theme,h.evidence_type,h.wishlist_link,h.primary_intent,h.journey_stage,h.barrier_theme,h.include,h.notes,r.human_review_status,r.human_decision,r.human_verified,r.human_label,r.human_verified_at].map(cell).join(','));});return lines.join('\n');}
+  function download(){const url=URL.createObjectURL(new Blob([exportCSV()],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='human_adjudication.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);E.fileStatus.textContent='Downloaded human_adjudication.csv; source and pilot files were not overwritten.';}
+  function loadFile(){const f=E.file.files[0];if(!f){E.fileStatus.textContent='Choose a human_adjudication.csv file first.';return;}if(!results.length){E.fileStatus.textContent='Load the pilot output before loading adjudication decisions.';return;}const rd=new FileReader();rd.onerror=()=>E.fileStatus.textContent='Could not read the adjudication file.';rd.onload=e=>{try{const rows=window.NykaaDiscoveryEngine.parseCSV(e.target.result),req=['record_id','human_review_status','human_decision','human_verified'],actual=Object.keys(rows[0]||{}),missing=req.filter(k=>!actual.includes(k));if(missing.length)throw new Error(`Missing ${missing.join(', ')}. Actual columns: ${actual.join(', ')||'(none)'}`);let applied=0,unknown=0;rows.forEach(s=>{if(v(s.human_review_status)!=='reviewed'||v(s.human_verified).toLowerCase()!=='true')return;const r=results.find(x=>v(x.record_id)===v(s.record_id));if(!r){unknown++;return;}r.human_evidence_type=v(s.human_evidence_type);r.human_wishlist_link=v(s.human_wishlist_link);r.human_primary_intent=v(s.human_primary_intent);r.human_journey_stage=v(s.human_journey_stage);r.human_barrier_theme=v(s.human_barrier_theme);r.human_include_in_quantitative_analysis=v(s.human_include_in_quantitative_analysis);r.reviewer_notes=v(s.reviewer_notes);r.human_decision=v(s.human_decision);r.human_verified=true;r.human_label=v(s.human_label);r.human_review_status='reviewed';r.human_verified_at=v(s.human_verified_at);r.reviewed_at=r.human_verified_at;applied++;});localSave();if(typeof saveState==='function')saveState();refresh();E.fileStatus.textContent=`Loaded ${applied} verified human decisions; ${unknown} IDs were not found. Candidate labels remain preserved.`;}catch(err){E.fileStatus.textContent='Adjudication load failed: '+v(err.message,'unexpected CSV error');}};rd.readAsText(f);}
+  document.getElementById('confirmClassification').onclick=confirm;document.getElementById('editClassification').onclick=edit;document.getElementById('saveHumanReview').onclick=()=>commit('corrected',{});document.getElementById('previousReview').onclick=()=>move(-1);document.getElementById('nextReview').onclick=()=>move(1);document.getElementById('reviewCurrent').onclick=()=>{const r=current();if(r)show(r.record_id);};document.getElementById('pendingOnly').onclick=togglePending;document.getElementById('downloadAdjudication').onclick=download;document.getElementById('loadAdjudication').onclick=loadFile;
+  document.getElementById('tagRack').addEventListener('click',e=>{const card=e.target.closest('.tag');if(card&&card.dataset.recordId)show(card.dataset.recordId);});document.getElementById('patternTable').addEventListener('click',e=>{const b=e.target.closest('[data-record-id]');if(b)show(b.dataset.recordId);});
+  ['filterTier','filterEvidenceType','filterWishlist','filterJourney','filterIntent','filterBarrier','filterSource','filterReview'].forEach(id=>document.getElementById(id).addEventListener('change',()=>{updateCounters();updateSummary();hideUnreconciledMetrics();}));
+  document.addEventListener('pilotloaded',()=>{applyLocal();E.panel.style.display='block';E.summaryPanel.style.display='block';refresh();const r=rows()[0];if(r)show(r.record_id);});
+  if(results.length){applyLocal();E.panel.style.display='block';E.summaryPanel.style.display='block';refresh();if(results[0])show(results[0].record_id);}
+  updateCounters();updateSummary();hideUnreconciledMetrics();
+  window.NykaaWishlistReview={show,confirm,edit,saveCorrection:()=>commit('corrected',{}),exportCSV,loadFile};
+})();
+</script>
+</body>
+</html>
