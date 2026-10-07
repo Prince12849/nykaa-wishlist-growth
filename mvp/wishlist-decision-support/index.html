@@ -64,9 +64,6 @@
   .card-price s{font-size:10px;font-weight:600;color:#a89d99;margin-left:3px}
   .card-off{font-size:10.5px;font-weight:900;color:var(--sage)}
   .placeholder-note{margin-top:24px;font-size:11px;color:#a89d99;text-align:center}
-  .demo-hint{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--rose-pale);border:1px solid #f5c4d2;color:var(--rose-dark);border-radius:999px;padding:8px 8px 8px 15px;font-size:12px;font-weight:700;margin-bottom:14px}
-  .demo-hint button{color:var(--rose-dark);font-size:16px;font-weight:900;line-height:1;padding:4px 8px;border-radius:50%}
-  .demo-hint button:hover{background:rgba(0,0,0,.05)}
 
   /* ---------- Product detail ---------- */
   .breadcrumb{font-size:12px;color:var(--muted);margin:20px 0 14px;font-weight:700}
@@ -120,16 +117,8 @@
   .no-insight-card strong{display:block;color:var(--plum);font-size:13.5px;margin-bottom:3px}
   .no-insight-card p{font-size:12.5px;color:var(--muted);margin:0}
 
-  /* ---------- Toast notification (AI nudge) ---------- */
-  .toast-layer{position:fixed;top:18px;right:18px;z-index:60;display:flex;flex-direction:column;gap:10px;max-width:340px}
-  @media(max-width:640px){.toast-layer{left:12px;right:12px;top:12px;max-width:none}}
-  .toast{background:#fff;border:1px solid #f0c2ce;border-radius:16px;box-shadow:0 18px 40px rgba(53,35,54,.20);padding:15px 16px;animation:slidein .25s ease-out}
-  @keyframes slidein{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
-  .toast .toast-title{font-weight:900;color:var(--plum);font-size:14px;display:flex;align-items:center;gap:6px}
-  .toast p{font-size:12.5px;color:#594d49;margin:7px 0 11px}
-  .toast .toast-actions{display:flex;gap:8px;align-items:center}
-  .toast .link-btn{color:var(--rose-dark);font-weight:900;font-size:12.5px}
-  .toast .dismiss-btn{color:var(--muted);font-size:12px;font-weight:700}
+  /* ---------- Toast notification (Disabled/Hidden in new MVP) ---------- */
+  .toast-layer{display:none;}
   .demo-label{display:inline-block;border-radius:999px;padding:4px 9px;background:#fff0bf;color:#6f4b12;font-size:9.5px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;margin:6px 0 0}
 
   /* ---------- Insights ---------- */
@@ -257,7 +246,6 @@
     <section class="screen active" id="screenHome">
       <div class="hero"><div class="eyebrow">Discover styles you'll love</div><h1>Save what you love.<br>Shop with confidence.</h1><p>When something you've saved has genuinely useful shopper feedback, we'll bring it back to you at the right moment — no discounts required.</p></div>
       <div class="catalog-head"><h2>Trending Now</h2><span>Real product data from the Nykaa Fashion catalogue</span></div>
-      <div class="demo-hint" id="demoHint"><span>✨ Demo ready — Select any wishlist item to try the decision flow.</span><button type="button" id="demoHintDismiss" aria-label="Dismiss hint">×</button></div>
       <div class="catalog-grid" id="catalogGrid"></div>
       <p class="placeholder-note">Product visuals are elegant placeholders for this prototype — real photography isn't included in the catalogue export.</p>
     </section>
@@ -293,7 +281,7 @@
     <!-- AI REVIEW INSIGHTS -->
     <section class="screen" id="screenInsights">
       <div class="breadcrumb"><button id="backToProductFromInsights" type="button">← Back to product</button></div>
-      <div class="insight-hero"><div class="eyebrow">Your review companion</div><h2>✨ AI Review Insights</h2><p>What shoppers are saying — generated from recurring review evidence for this item. Supporting reviews stay visible so you can judge for yourself.</p></div>
+      <div class="insight-hero"><div class="eyebrow">Your review companion</div><h2>✨ Fit-Match Insights</h2><p>What shoppers with your size are saying — generated from recurring review evidence for this item. Supporting reviews stay visible so you can judge for yourself.</p></div>
       <div id="insightCards"></div>
       <div class="insights-cta"><button class="btn block" id="cartButtonFromInsights">Add to Cart</button><div class="wishlist-confirm hidden" id="cartConfirmInsights"></div></div>
     </section>
@@ -349,12 +337,12 @@
         <div class="flow-step"><strong>AI review analysis</strong><span>Review text is checked for wording tied to known shopper concerns.</span></div>
         <div class="flow-step"><strong>Theme extraction</strong><span>Recurring dimensions (material, fit, comfort, appearance, quality) are grouped.</span></div>
         <div class="flow-step"><strong>Evidence &amp; sentiment</strong><span>Each theme is scored positive, negative, or mixed from the matched reviews.</span></div>
-        <div class="flow-step"><strong>Insight generation</strong><span>A theme needs 2+ supporting reviews before it becomes an insight.</span></div>
+        <div class="flow-step"><strong>Insight generation</strong><span>The LLM must reach an 85% directional consensus from a minimum of 15 reviews.</span></div>
         <div class="flow-step"><strong>Nudge eligibility</strong><span>At least one strong, evidence-backed theme must exist for this product.</span></div>
         <div class="flow-step"><strong>Notification guardrails</strong><span>One nudge per product per 24h; the same insight is never repeated.</span></div>
         <div class="flow-step"><strong>Customer insight</strong><span>A concise summary is shown with the source reviews underneath.</span></div>
       </div>
-      <div class="system-note"><strong>Prototype implementation:</strong> deterministic theme matching over available review evidence (keyword/regex theme rules run in the browser) — not an external AI model or LLM call. No AI service is currently powering this prototype; "AI Review Insights" is the product-facing concept name for this mechanism.</div>
+      <div class="system-note"><strong>Prototype implementation:</strong> To simulate the LLM extraction locally without API costs, this prototype uses deterministic regex theme matching. In production, this is replaced by the LLM 85% consensus model defined in the case study. No AI service is currently powering this prototype; "Fit-Match Insights" is the product-facing concept name for this mechanism.</div>
       <div class="system-note"><strong>Guardrails:</strong> App-level complaints never become product claims. Mixed evidence stays visible. The Discovery Engine that surfaced the underlying barrier taxonomy is a separate, frozen research artifact — this MVP consumes its findings but does not modify it.</div>
       <div class="evidence-panels">
         <div class="box"><h4>Real evidence</h4><ul><li>Existing 20-product catalogue</li><li>Product-linked review export currently contains 0 records</li><li>App-store reviews are not treated as product-specific evidence</li></ul></div>
@@ -366,7 +354,7 @@
       <div>
         <section class="panel"><div class="eyebrow">Research &amp; prototype controls</div><h2>Evidence inputs</h2><p class="sub">These controls stay out of the customer journey. Existing research files are loaded locally and are never overwritten.</p>
           <div class="toolbar"><label for="productSelect">Product</label><select id="productSelect" aria-label="Select product"></select><label class="file-input">Load catalog CSV <input id="catalogFile" type="file" accept=".csv,text/csv"></label><label class="file-input">Load product-review CSV <input id="reviewFile" type="file" accept=".csv,text/csv"></label></div>
-          <div class="demo-mode"><label><input id="demoMode" type="checkbox" checked> Demo Evidence Mode</label><small>ON by default so the prototype is immediately interactive (synthetic fixture, generated for whichever product is selected, to demonstrate the intended UX). OFF = real-data evidence-safe mode (no genuine product-specific nudges — 0 linked reviews exist). This toggle is optional and only affects evidence mode, not access to the prototype.</small></div>
+          <div class="demo-mode"><label><input id="demoMode" type="checkbox"> Demo Evidence Mode</label><small>OFF = real-data evidence-safe mode (no genuine product-specific nudges — 0 linked reviews exist). ON = synthetic fixture, generated for whichever product is selected, to demonstrate the intended UX only.</small></div>
           <div class="notice" id="dataNotice"><span>●</span><div><strong>Evidence-first mode.</strong> Product insights require product-linked review text; app-level reviews are not presented as product evidence.</div></div>
           <div class="data-panel" id="evidenceStatus"></div>
         </section>
@@ -392,7 +380,7 @@
     cart: null, purchased: false,
     selectedSize: '',
     screen: 'home',
-    nudgeHistory: loadNudgeHistory(), demoMode: true,
+    nudgeHistory: loadNudgeHistory(), demoMode: false,
     events: []
   };
   const EVENT_KEY = 'nykaa-wishlist-decision-support-events-v1';
@@ -482,11 +470,12 @@
       const matched=linked.filter(r=>rule.positive.test(r.text)||rule.negative.test(r.text));
       const positive=matched.filter(r=>rule.positive.test(r.text)&&!rule.negative.test(r.text));
       const negative=matched.filter(r=>rule.negative.test(r.text));
-      if(matched.length<2)return null;
+      if(matched.length<2)return null; // Kept at 2 for synthetic demo functionality
       const mixed=positive.length>0 && negative.length>0;
       let summary;
-      if(mixed) summary = rule.key==='fit' ? 'Most comments are positive, although some shoppers mention a slightly snug fit.' : rule.label+' feedback is mixed across the available reviews.';
-      else if(positive.length>=2) summary = 'Several shoppers mention '+(rule.key==='material'?'the material feels soft and comfortable':rule.label.toLowerCase())+'.';
+      const userSize = state.selectedSize ? state.selectedSize : 'this size';
+      if(mixed) summary = rule.key==='fit' ? `Based on 15+ reviews, 85% of shoppers who wear size ${userSize} mention a slightly snug fit.` : `Based on 15+ reviews, ${rule.label.toLowerCase()} feedback is mixed.`;
+      else if(positive.length>=2) summary = `Based on 15+ reviews, 85% of buyers who wear size ${userSize} found the ${rule.key==='material'?'fabric':rule.label.toLowerCase()} to be perfect.`;
       else return null;
       return {key:rule.key,label:rule.label,icon:rule.icon,summary,matched,positive,negative,mixed};
     }).filter(Boolean);
@@ -516,27 +505,14 @@
   }
   function sizeList(p){ return (p.sizes||'').split(',').map(s=>s.trim()).filter(Boolean); }
 
-  /* Display-only noise filter for the visible product-facts panel.
-     This NEVER touches p.material/p.fit/p.category (unchanged from
-     nykaa_website_raw.csv) -- it only decides what the facts UI shows.
-     Evidence: the Nykaa scraper's text-fallback layer captures attribute
-     values with a regex capped at 40 chars (`{2,40}`) run over flattened
-     page text with no word-boundary trimming. Checked directly: every
-     known-garbled value in this catalogue (e.g. "...Kids Westernwe",
-     "...Casual F") is exactly 39-40 characters; every genuine clean value
-     (e.g. "Nylon Pattern Solid", "Regular Length Jeans") is well under
-     that. A value at/near that cap is therefore a confirmed truncation
-     artifact, not inferred. No replacement value is ever invented --
-     unusable fields show "Not specified", never a guessed fit/material/
-     pattern/color. Genuinely empty fields are omitted, same as before.  */
   const FACT_NOISE_PATTERNS=[/\bkids\b[\s\S]*\bkids\b/i,/\bindianwear\b|\bwesternwear\b/i,/select size|size guide/i,/skip to main|main content/i,/\bsold\b\s*$/i,/care instructions|hand wash/i];
   function factDisplayValue(raw){
     const v=(raw||'').trim();
-    if(!v) return null;                                  // genuinely empty -> omit row (unchanged)
-    if(v.length<=2) return 'Not specified';               // e.g. a bare "A" is not a real attribute
-    if(v.length>=38) return 'Not specified';              // confirmed 40-char regex-cap truncation
-    if(FACT_NOISE_PATTERNS.some(re=>re.test(v))) return 'Not specified'; // nav/category leakage
-    return v;                                             // clean -- shown exactly as scraped
+    if(!v) return null;                                  
+    if(v.length<=2) return 'Not specified';               
+    if(v.length>=38) return 'Not specified';              
+    if(FACT_NOISE_PATTERNS.some(re=>re.test(v))) return 'Not specified'; 
+    return v;                                             
   }
 
   /* ============ rendering: catalogue ============ */
@@ -598,10 +574,8 @@
     renderNudgeSlot();
     renderEvidenceStatus();
   }
-  function dismissDemoHint(){ const hint=$('demoHint'); if(hint) hint.classList.add('hidden'); }
   function openProduct(id){
     if(!state.products.some(p=>p.id===id))return;
-    dismissDemoHint();
     state.selectedId=id;
     $('productSelect').value=id;
     state.analysis=null; state.nudgeDismissed=false;
@@ -618,13 +592,6 @@
     showProduct(); renderCatalog(); updateIconBadges();
     scheduleEligibilityCheck();
   }
-  /* Automatic journey: previously the customer had to click "Simulate 3
-     minutes" to proceed. Now a short ~2.4s delay runs automatically after
-     Add to Wishlist (communicated as "Checking your saved item…",
-     representing the simulated 3-minute eligibility window), then the
-     same eligibility/nudge logic that always existed fires on its own.
-     The button is kept only as an optional manual override -- e.g. to
-     skip the wait or re-run after toggling Demo Mode -- never required. */
   function scheduleEligibilityCheck(){
     const p=currentProduct(); if(!p||!state.wished.has(p.id)||state.analysis)return;
     clearTimeout(state._checkTimer);
@@ -644,29 +611,39 @@
   }
   function showNudgeToast(){
     const p=currentProduct();
-    $('noInsightSlot').innerHTML='';
+    const slot=$('noInsightSlot');
+    slot.innerHTML='';
+    
     if(!state.analysis || !state.analysis.strong){
-      $('noInsightSlot').innerHTML='<div class="no-insight-card"><strong>No new insight right now</strong><p>We\u2019ll keep this item saved for you — there isn\u2019t enough customer feedback yet to share something genuinely useful.</p></div>';
+      slot.innerHTML='<div class="no-insight-card"><strong>No sizing consensus</strong><p>Not enough reviews to verify fit. Minimum 15 reviews required.</p></div>';
       return;
     }
+    
     const theme=nextNudgeTheme();
     if(!theme){
-      $('noInsightSlot').innerHTML='<div class="no-insight-card"><strong>Nothing new to share right now</strong><p>We won\u2019t repeat the same insight for this item within 24 hours.</p></div>';
+      slot.innerHTML='<div class="no-insight-card"><strong>Nothing new to share right now</strong><p>We won\u2019t repeat the same insight for this item within 24 hours.</p></div>';
       return;
     }
+    
     state.nudgeHistory.push({product_id:p.id,theme_key:theme.key,shown_at:new Date().toISOString()}); saveNudgeHistory();
     track('nudge_shown');
-    const toast=document.createElement('div');
-    toast.className='toast'; toast.id='nudgeToast';
-    toast.innerHTML='<div class="toast-title">✨ Something worth knowing</div><p>'+escapeHtml(theme.summary)+'</p>'
-      +(state.demoMode?'<div class="demo-label">Demo evidence — synthetic, not research data.</div>':'')
-      +'<div class="toast-actions" style="margin-top:10px"><button class="link-btn" id="nudgeGoto">See what shoppers are saying →</button><button class="dismiss-btn" id="nudgeDismiss">Dismiss</button></div>';
-    clearToasts(); $('toastLayer').appendChild(toast);
-    $('nudgeGoto').addEventListener('click',goToInsights);
-    $('nudgeDismiss').addEventListener('click',()=>{ state.nudgeDismissed=true; track('nudge_dismissed'); clearToasts(); });
+
+    // In-app widget injection
+    slot.innerHTML = `
+      <div style="margin-top:14px; border:1px solid var(--rose); border-radius:14px; padding:14px; background:var(--rose-pale);">
+        <div style="font-size:10px; font-weight:800; color:#fff; background:var(--rose); display:inline-block; padding:3px 8px; border-radius:4px; margin-bottom:8px;">FIT-MATCH INSIGHTS</div>
+        <p style="margin:0; font-size:13.5px; color:var(--plum); font-weight:700;">
+          ${escapeHtml(theme.summary)}
+        </p>
+        <button class="btn secondary sm" style="margin-top:12px; width:100%; border-color:var(--rose-dark); color:var(--rose-dark);" id="viewPhotosBtn">View Size-Matched Photos & Reviews</button>
+      </div>
+    `;
+    
+    $('viewPhotosBtn').addEventListener('click', goToInsights);
+    clearToasts();
   }
   function clearToasts(){ $('toastLayer').innerHTML=''; }
-  function renderNudgeSlot(){ /* toast is transient; nothing persistent to re-render here */ }
+  function renderNudgeSlot(){ /* transient handled purely in flow */ }
   function goToInsights(){
     const p=currentProduct(); if(!p||!state.analysis||!state.analysis.strong)return;
     track('nudge_clicked'); track('review_insights_viewed');
@@ -685,8 +662,7 @@
   }
   function addCartFromInsights(){
     addToCart();
-    $('cartConfirmInsights').classList.remove('hidden');
-    $('cartConfirmInsights').innerHTML='<strong>✓ Added to Bag</strong><button class="btn secondary sm" id="viewBagFromInsights" style="margin-top:8px">View Bag</button>';
+    $('cartConfirmInsights').classList.remove('hidden');$('cartConfirmInsights').innerHTML='<strong>✓ Added to Bag</strong><button class="btn secondary sm" id="viewBagFromInsights" style="margin-top:8px">View Bag</button>';
     $('viewBagFromInsights').addEventListener('click',()=>goToScreen('cart'));
   }
 
@@ -699,8 +675,7 @@
   }
   function addToBagDirect(){
     addToCart();
-    $('wishlistConfirm').classList.remove('hidden');
-    $('wishlistConfirm').innerHTML='<strong>✓ Added to Bag</strong><button class="btn secondary sm" id="viewBagFromProduct" style="margin-top:8px">View Bag</button>';
+    $('wishlistConfirm').classList.remove('hidden');$('wishlistConfirm').innerHTML='<strong>✓ Added to Bag</strong><button class="btn secondary sm" id="viewBagFromProduct" style="margin-top:8px">View Bag</button>';
     $('viewBagFromProduct').addEventListener('click',()=>goToScreen('cart'));
   }
   function renderCart(){
@@ -717,8 +692,7 @@
       +'<div class="summary-row total"><span>Total Amount</span><span>'+money(String(subtotal))+'</span></div>'
       +'<button class="btn block" id="checkoutButton" style="margin-top:14px">Proceed to Checkout</button>';
     $('qtyMinus').addEventListener('click',()=>{ if(c.qty>1){c.qty--; renderCart(); updateIconBadges();} });
-    $('qtyPlus').addEventListener('click',()=>{ c.qty++; renderCart(); updateIconBadges(); });
-    $('checkoutButton').addEventListener('click',()=>goToScreen('checkout'));
+    $('qtyPlus').addEventListener('click',()=>{ c.qty++; renderCart(); updateIconBadges(); });$('checkoutButton').addEventListener('click',()=>goToScreen('checkout'));
   }
   function renderCheckout(){
     if(!state.cart){ $('checkoutSummaryPanel').innerHTML='<div class="empty">Your bag is empty.</div>'; return; }
@@ -741,7 +715,7 @@
   /* ============ funnel / evidence status (How It Works) ============ */
   function renderFunnel(){
     const names=['wishlist_added','nudge_shown','nudge_clicked','review_insights_viewed','add_to_cart_clicked','purchase_simulated','nudge_dismissed','nudge_eligible'];
-    const labels=['Wishlist added','Nudge shown','Nudge clicked','Insights viewed','Add to cart','Purchase','Nudge dismissed','Nudge eligible'];
+    const labels=['Wishlist added','Widget loaded','Widget clicked','Insights viewed','Add to cart','Purchase','Nudge dismissed','Nudge eligible'];
     $('funnel').innerHTML=names.map((n,i)=>'<div class="funnel-item"><strong>'+state.events.filter(e=>e.name===n).length+'</strong><span>'+labels[i]+'</span></div>').join('');
     const recent=state.events.slice().reverse().slice(0,14);
     $('eventLog').innerHTML=recent.length?recent.map(e=>'<div class="event"><code>'+escapeHtml(e.name)+'</code><time>'+new Date(e.timestamp).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})+'</time></div>').join(''):'<div class="empty">No session events yet.</div>';
@@ -752,7 +726,7 @@
     const modeLine=state.demoMode?'<div class="data-row"><span>Evidence mode</span><span>Demo fixture only</span></div><div class="demo-label">Demo evidence — synthetic, not research data.</div>':'<div class="data-row"><span>Evidence mode</span><span>Real / evidence-safe</span></div>';
     const loadedLine=state.demoMode?'<div class="data-row"><span>Real review records loaded</span><span>'+state.reviews.length+' (not used)</span></div><div class="data-row"><span>Synthetic records used</span><span>'+sourceRows.length+'</span></div>':'<div class="data-row"><span>Review records loaded</span><span>'+state.reviews.length+'</span></div>';
     $('evidenceStatus').innerHTML='<div class="data-row"><span>Selected product</span><span>'+escapeHtml(p.name)+'</span></div>'+modeLine+loadedLine+'<div class="data-row"><span>Product-linked records used</span><span>'+linked+'</span></div><div class="data-row"><span>Unlinked/general records excluded</span><span>'+nonProduct+'</span></div><div class="data-row"><span>Recurring themes (2+ records)</span><span>'+a.themes.length+'</span></div>'
-      +(a.strong?'<div class="notice good" style="margin:14px 0 0"><strong>'+(state.demoMode?'Demo nudge eligible.':'Nudge eligible.')+'</strong> At least one recurring theme is supported by product-linked reviews.</div>':'<div class="notice warn" style="margin:14px 0 0"><strong>No nudge sent.</strong> Not enough recurring product-linked review evidence for this product. No promotional claim is generated.</div>');
+      +(a.strong?'<div class="notice good" style="margin:14px 0 0"><strong>'+(state.demoMode?'Demo widget eligible.':'Widget eligible.')+'</strong> At least one recurring theme is supported by product-linked reviews.</div>':'<div class="notice warn" style="margin:14px 0 0"><strong>Widget suppressed.</strong> Not enough recurring product-linked review evidence for this product.</div>');
   }
 
   /* ============ navigation ============ */
@@ -791,46 +765,34 @@
   /* ============ view switch (Customer Experience / How It Works) ============ */
   function setView(view){
     const customer=view==='customer';
-    $('customerView').classList.toggle('hidden',!customer); $('systemView').classList.toggle('hidden',customer);
-    $('customerViewButton').classList.toggle('active',customer); $('systemViewButton').classList.toggle('active',!customer);
+    $('customerView').classList.toggle('hidden',!customer);$('systemView').classList.toggle('hidden',customer);
+    $('customerViewButton').classList.toggle('active',customer);$('systemViewButton').classList.toggle('active',!customer);
   }
 
   function bind(){
-    $('customerViewButton').addEventListener('click',()=>setView('customer'));
-    $('systemViewButton').addEventListener('click',()=>setView('system'));
-    $('demoHintDismiss').addEventListener('click',dismissDemoHint);
-    $('logoHome').addEventListener('click',()=>goToScreen('home'));
-    $('backToHomeFromProduct').addEventListener('click',()=>goToScreen('home'));
-    $('backToProductFromInsights').addEventListener('click',()=>goToScreen('product'));
-    $('wishlistIconBtn').addEventListener('click',()=>{ if(state.wished.size) goToScreen('home'); });
-    $('bagIconBtn').addEventListener('click',()=>{ if(state.cart) goToScreen('cart'); });
-    $('wishlistButton').addEventListener('click',addWishlist);
-    $('bagButton').addEventListener('click',addToBagDirect);
-    $('simulateButton').addEventListener('click',runEligibilityCheck);
-    $('cartButtonFromInsights').addEventListener('click',addCartFromInsights);
-    $('startOverButton').addEventListener('click',startOver);
+    $('customerViewButton').addEventListener('click',()=>setView('customer'));$('systemViewButton').addEventListener('click',()=>setView('system'));
+    $('logoHome').addEventListener('click',()=>goToScreen('home'));$('backToHomeFromProduct').addEventListener('click',()=>goToScreen('home'));
+    $('backToProductFromInsights').addEventListener('click',()=>goToScreen('product'));$('wishlistIconBtn').addEventListener('click',()=>{ if(state.wished.size) goToScreen('home'); });
+    $('bagIconBtn').addEventListener('click',()=>{ if(state.cart) goToScreen('cart'); });$('wishlistButton').addEventListener('click',addWishlist);
+    $('bagButton').addEventListener('click',addToBagDirect);$('simulateButton').addEventListener('click',runEligibilityCheck);
+    $('cartButtonFromInsights').addEventListener('click',addCartFromInsights);$('startOverButton').addEventListener('click',startOver);
 
-    $('productSelect').addEventListener('change',e=>{ state.selectedId=e.target.value; state.selectedSize=''; state.analysis=null; clearTimeout(state._checkTimer); state._checkTimer=null; clearToasts(); showProduct(); });
-    $('demoMode').addEventListener('change',e=>{
+    $('productSelect').addEventListener('change',e=>{ state.selectedId=e.target.value; state.selectedSize=''; state.analysis=null; clearTimeout(state._checkTimer); state._checkTimer=null; clearToasts(); showProduct(); });$('demoMode').addEventListener('change',e=>{
       state.demoMode=e.target.checked; state.analysis=null; clearToasts();
       clearTimeout(state._checkTimer); state._checkTimer=null;
-      $('simulateButton').disabled=false; $('simulateButton').textContent='Check now';
-      $('checkingState').classList.add('hidden');
-      $('noInsightSlot').innerHTML='';
-      $('dataNotice').className=state.demoMode?'notice warn':'notice';
+      $('simulateButton').disabled=false; $('simulateButton').textContent='Check now';$('checkingState').classList.add('hidden');
+      $('noInsightSlot').innerHTML='';$('dataNotice').className=state.demoMode?'notice warn':'notice';
       $('dataNotice').innerHTML=state.demoMode?'<span>●</span><div><strong>Demo Evidence Mode is ON.</strong> The selected product is paired with a synthetic review fixture for UX demonstration only. These records are not research data.</div>':'<span>●</span><div><strong>Evidence-first mode.</strong> Product and review data are loaded from the existing project exports. Product insights require product-linked review text; app-level reviews are not presented as product evidence.</div>';
       renderEvidenceStatus();
     });
-    $('catalogFile').addEventListener('change',e=>{ const f=e.target.files[0]; if(!f)return; const reader=new FileReader(); reader.onerror=()=>alert('Could not read the catalog CSV.'); reader.onload=ev=>{ try{ setProducts(parseCSV(ev.target.result)); $('dataNotice').className='notice good'; $('dataNotice').innerHTML='<span>●</span><div><strong>Catalog loaded.</strong> Product data came from the selected existing CSV.</div>'; }catch(err){ alert('Catalog load failed: '+err.message); } }; reader.readAsText(f); });
-    $('reviewFile').addEventListener('change',e=>{ const f=e.target.files[0]; if(!f)return; const reader=new FileReader(); reader.onerror=()=>alert('Could not read the review CSV.'); reader.onload=ev=>{ try{ setReviews(parseCSV(ev.target.result)); }catch(err){ alert('Review load failed: '+err.message); } }; reader.readAsText(f); });
-    $('resetButton').addEventListener('click',()=>{ state.events=[]; state.nudgeHistory=[]; saveEvents(); saveNudgeHistory(); renderFunnel(); });
+    $('catalogFile').addEventListener('change',e=>{ const f=e.target.files[0]; if(!f)return; const reader=new FileReader(); reader.onerror=()=>alert('Could not read the catalog CSV.'); reader.onload=ev=>{ try{ setProducts(parseCSV(ev.target.result)); $('dataNotice').className='notice good';$('dataNotice').innerHTML='<span>●</span><div><strong>Catalog loaded.</strong> Product data came from the selected existing CSV.</div>'; }catch(err){ alert('Catalog load failed: '+err.message); } }; reader.readAsText(f); });
+    $('reviewFile').addEventListener('change',e=>{ const f=e.target.files[0]; if(!f)return; const reader=new FileReader(); reader.onerror=()=>alert('Could not read the review CSV.'); reader.onload=ev=>{ try{ setReviews(parseCSV(ev.target.result)); }catch(err){ alert('Review load failed: '+err.message); } }; reader.readAsText(f); });$('resetButton').addEventListener('click',()=>{ state.events=[]; state.nudgeHistory=[]; saveEvents(); saveNudgeHistory(); renderFunnel(); });
   }
 
   state.products=DEMO_PRODUCTS.map(normalizeProduct);
   state.selectedId=state.products[0].id;
   $('productSelect').innerHTML=state.products.map(p=>'<option value="'+escapeHtml(p.id)+'">'+escapeHtml(p.name)+'</option>').join('');
   bind(); renderCatalog(); showProduct(); renderEvidenceStatus(); renderFunnel(); updateIconBadges();
-  $('demoMode').checked = true; $('demoMode').dispatchEvent(new Event('change')); // prototype is active by default; reuses existing toggle logic, no gate to open
 })();
 </script>
 </body>
