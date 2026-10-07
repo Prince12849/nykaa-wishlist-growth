@@ -64,6 +64,9 @@
   .card-price s{font-size:10px;font-weight:600;color:#a89d99;margin-left:3px}
   .card-off{font-size:10.5px;font-weight:900;color:var(--sage)}
   .placeholder-note{margin-top:24px;font-size:11px;color:#a89d99;text-align:center}
+  .demo-hint{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--rose-pale);border:1px solid #f5c4d2;color:var(--rose-dark);border-radius:999px;padding:8px 8px 8px 15px;font-size:12px;font-weight:700;margin-bottom:14px}
+  .demo-hint button{color:var(--rose-dark);font-size:16px;font-weight:900;line-height:1;padding:4px 8px;border-radius:50%}
+  .demo-hint button:hover{background:rgba(0,0,0,.05)}
 
   /* ---------- Product detail ---------- */
   .breadcrumb{font-size:12px;color:var(--muted);margin:20px 0 14px;font-weight:700}
@@ -246,6 +249,7 @@
     <section class="screen active" id="screenHome">
       <div class="hero"><div class="eyebrow">Discover styles you'll love</div><h1>Save what you love.<br>Shop with confidence.</h1><p>When something you've saved has genuinely useful shopper feedback, we'll bring it back to you at the right moment — no discounts required.</p></div>
       <div class="catalog-head"><h2>Trending Now</h2><span>Real product data from the Nykaa Fashion catalogue</span></div>
+      <div class="demo-hint" id="demoHint"><span>✨ Demo ready — Select any wishlist item to try the decision flow.</span><button type="button" id="demoHintDismiss" aria-label="Dismiss hint">×</button></div>
       <div class="catalog-grid" id="catalogGrid"></div>
       <p class="placeholder-note">Product visuals are elegant placeholders for this prototype — real photography isn't included in the catalogue export.</p>
     </section>
@@ -354,7 +358,7 @@
       <div>
         <section class="panel"><div class="eyebrow">Research &amp; prototype controls</div><h2>Evidence inputs</h2><p class="sub">These controls stay out of the customer journey. Existing research files are loaded locally and are never overwritten.</p>
           <div class="toolbar"><label for="productSelect">Product</label><select id="productSelect" aria-label="Select product"></select><label class="file-input">Load catalog CSV <input id="catalogFile" type="file" accept=".csv,text/csv"></label><label class="file-input">Load product-review CSV <input id="reviewFile" type="file" accept=".csv,text/csv"></label></div>
-          <div class="demo-mode"><label><input id="demoMode" type="checkbox"> Demo Evidence Mode</label><small>OFF = real-data evidence-safe mode (no genuine product-specific nudges — 0 linked reviews exist). ON = synthetic fixture, generated for whichever product is selected, to demonstrate the intended UX only.</small></div>
+          <div class="demo-mode"><label><input id="demoMode" type="checkbox" checked> Demo Evidence Mode</label><small>ON by default so the prototype is immediately interactive (synthetic fixture, generated for whichever product is selected, to demonstrate the intended UX). OFF = real-data evidence-safe mode (no genuine product-specific nudges — 0 linked reviews exist). This toggle is optional and only affects evidence mode, not access to the prototype.</small></div>
           <div class="notice" id="dataNotice"><span>●</span><div><strong>Evidence-first mode.</strong> Product insights require product-linked review text; app-level reviews are not presented as product evidence.</div></div>
           <div class="data-panel" id="evidenceStatus"></div>
         </section>
@@ -380,7 +384,7 @@
     cart: null, purchased: false,
     selectedSize: '',
     screen: 'home',
-    nudgeHistory: loadNudgeHistory(), demoMode: false,
+    nudgeHistory: loadNudgeHistory(), demoMode: true,
     events: []
   };
   const EVENT_KEY = 'nykaa-wishlist-decision-support-events-v1';
@@ -574,8 +578,10 @@
     renderNudgeSlot();
     renderEvidenceStatus();
   }
+  function dismissDemoHint(){ const hint=$('demoHint'); if(hint) hint.classList.add('hidden'); }
   function openProduct(id){
     if(!state.products.some(p=>p.id===id))return;
+    dismissDemoHint();
     state.selectedId=id;
     $('productSelect').value=id;
     state.analysis=null; state.nudgeDismissed=false;
@@ -770,7 +776,8 @@
   }
 
   function bind(){
-    $('customerViewButton').addEventListener('click',()=>setView('customer'));$('systemViewButton').addEventListener('click',()=>setView('system'));
+    $('customerViewButton').addEventListener('click',()=>setView('customer'));
+    $('systemViewButton').addEventListener('click',()=>setView('system'));$('demoHintDismiss').addEventListener('click',dismissDemoHint);
     $('logoHome').addEventListener('click',()=>goToScreen('home'));$('backToHomeFromProduct').addEventListener('click',()=>goToScreen('home'));
     $('backToProductFromInsights').addEventListener('click',()=>goToScreen('product'));$('wishlistIconBtn').addEventListener('click',()=>{ if(state.wished.size) goToScreen('home'); });
     $('bagIconBtn').addEventListener('click',()=>{ if(state.cart) goToScreen('cart'); });$('wishlistButton').addEventListener('click',addWishlist);
@@ -793,6 +800,7 @@
   state.selectedId=state.products[0].id;
   $('productSelect').innerHTML=state.products.map(p=>'<option value="'+escapeHtml(p.id)+'">'+escapeHtml(p.name)+'</option>').join('');
   bind(); renderCatalog(); showProduct(); renderEvidenceStatus(); renderFunnel(); updateIconBadges();
+  $('demoMode').checked = true; $('demoMode').dispatchEvent(new Event('change')); // prototype is active by default
 })();
 </script>
 </body>
